@@ -58,6 +58,43 @@ Vite replaces the frontend build system, not the Next.js server routes. The exis
 - Preserve Hebrew text, RTL behavior, fonts, page titles, and existing URLs.
 - Confirm SEO and social-preview requirements before accepting client-only rendering for public content. Per-page HTML metadata may require a separate prerendering decision.
 
+## Step 2: Minimal UI migration kickoff
+
+The Vite application has been scaffolded with TanStack Router and shadcn/ui. Start with a small, reviewable UI slice rather than migrating every dashboard at once.
+
+### First milestone
+
+- [ ] **Shared application shell:** Port the existing header, footer, navigation, content container, and required providers from `old-nextjs/app/layout.tsx` and its components. Use a TanStack Router root layout with an outlet.
+- [ ] **Home page (`/`):** Port `old-nextjs/app/page.tsx` and `components/Sections/HomePage`, including only the components and assets needed by that page. Preserve the existing section order, visual hierarchy, and links. Defer linked dashboards rather than importing them solely to satisfy navigation.
+- [ ] **About page (`/about`):** Port `old-nextjs/app/about/page.tsx` and `components/Sections/AboutSection`. This provides a second real route and a mostly static page for checking shared layout and navigation.
+- [ ] **Not-found view:** Add a small, styled not-found view with a working link back to the home page.
+
+### Design preservation
+
+- Keep the existing design rather than adopting the scaffold's demo appearance or default shadcn styling.
+- Preserve Hebrew copy, `lang="he"`, RTL direction, Heebo typography, brand colors, theme tokens, spacing, backgrounds, image assets, and responsive layouts.
+- Reuse customized shadcn components where needed, adapting them to the new dependency versions without resetting their appearance.
+- Replace Next.js links, images, and fonts with Vite-compatible implementations. Keep image aspect ratios, alt text, and layout behavior.
+- Keep visible navigation labels and existing URL paths. For destinations not yet migrated, use an explicit temporary unavailable page or clearly disabled item; do not silently redirect them to unrelated content.
+- Leave `old-nextjs` intact as the visual and behavior reference until the migrated pages are accepted.
+
+### Scope boundaries
+
+- Do not migrate all charts, data dashboards, search, API documentation, contact submission, or newsletter tracking in this first milestone.
+- If home-page sections require API data, preserve their layout with clearly labeled development fixtures or loading/error states until secure API access is ready. Never present fixture values as live data.
+- Do not simulate successful contact or newsletter submissions. Keep submission unavailable until the server handlers are migrated.
+- Import only dependencies and components needed for this milestone. Do not copy the entire old component tree or remove the existing scaffold configuration wholesale.
+
+### Acceptance checks
+
+- Both `/` and `/about` render through TanStack Router, and browser back/forward navigation works.
+- Direct route loads and refreshes work with the configured hosting fallback.
+- Header, footer, mobile navigation, typography, and RTL layouts match the source at representative desktop and mobile widths.
+- Images and fonts load without Next.js packages or missing assets.
+- Unknown URLs show the not-found view, and deferred navigation has an explicit state.
+- The frontend builds and type-checks with no browser console errors on the migrated pages.
+- No backend secrets appear in browser code or bundled assets.
+
 ## Next planning steps
 
 1. Inventory existing pages, Next.js APIs, providers, environment variables, and deployment assumptions.
