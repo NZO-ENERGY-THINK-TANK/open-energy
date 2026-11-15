@@ -1,0 +1,172 @@
+# Included by nginx.conf inside the http context. Keep this path regex identical
+# to config/public-api.ts PUBLIC_API_PATTERN, adding only an optional query suffix.
+map $request_uri $site_api_allowed {
+    default 0;
+    ~^/api/backend/api/v1/(?:energy/(?:overview(?:/(?:details|export))?|production-mix(?:/export)?|smp(?:/export)?|smp-production-vs-marginal-price(?:/export)?)|co2/(?:emissions-savings|emissions-ratio|total-production|emissions-mix(?:/export)?|emissions-over-time(?:/export)?|total-vs-ratio(?:/export-csv)?)|private-supplier-connected-consumers(?:/(?:export|download-source))?|switching-requests(?:/export)?|heat-load-vs-generation(?:/export)?|renewables/(?:production-mix|transition|potential-by-industry|installed-capacity/(?:cumulative|growth|by-facility-size)|response-capacity/(?:by-period|by-size|by-district)|renewable-forecast-israel|international-renewable-comparison)(?:/export)?|apis)/?(?:\?.*)?$ 1;
+}
+
+# Strip only the literal prefix from the original request target. Using $uri or
+# a rewrite here would normalize/decode paths before forwarding with credentials.
+map $request_uri $site_backend_uri {
+    default "";
+    ~^/api/backend(?<site_backend_path>/.*)$ $site_backend_path;
+}
+
+# Contact and newsletter submissions share a per-client budget. Do not trust
+# client-supplied forwarding headers for this key; configure trusted real IPs
+# separately if nginx sits behind a load balancer.
+limit_req_zone $binary_remote_addr zone=site_forms:10m rate=5r/m;
+
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+    server_tokens off;
+
+    # API query strings may contain personal data. Never log headers or bodies.
+    access_log off;
+    error_log /var/log/nginx/error.log warn;
+    client_body_timeout 10s;
+    limit_req_status 429;
+    limit_req_log_level notice;
+
+    # Variable proxy_pass targets need Docker's embedded DNS resolver.
+    resolver 127.0.0.11 valid=30s ipv6=off;
+    resolver_timeout 3s;
+    proxy_http_version 1.1;
+    proxy_connect_timeout 3s;
+    proxy_send_timeout 10s;
+    proxy_read_timeout 120s;
+    proxy_next_upstream off;
+    proxy_redirect off;
+    proxy_hide_header Location;
+    proxy_hide_header Refresh;
+    proxy_hide_header X-Api-Key;
+
+    location ^~ /api/backend/ {
+        if ($site_api_allowed = 0) {
+            return 404;
+        }
+        if ($request_method != GET) {
+            return 405;
+        }
+        add_header Allow "GET" always;
+
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_set_header Host $proxy_host;
+        proxy_set_header Connection "";
+        proxy_set_header X-Api-Key "${INTERNAL_API_KEY}";
+        proxy_set_header Authorization "";
+        proxy_set_header Cookie "";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Fail closed rather than exposing an upstream redirect or sending the
+        # browser outside the validated proxy path. Canonical slashes matter.
+        proxy_intercept_errors on;
+        error_page 301 302 303 307 308 =502 @site_api_redirect;
+        proxy_pass ${BACKEND_ORIGIN}$site_backend_uri;
+    }
+
+    location = /api/backend {
+        return 404;
+    }
+
+    location = /api/submit-contact {
+        if ($request_method != POST) {
+            return 405;
+        }
+        add_header Allow "POST" always;
+        client_max_body_size 32k;
+        limit_req zone=site_forms burst=5 nodelay;
+        proxy_read_timeout 20s;
+
+        proxy_set_header Host $proxy_host;
+        proxy_set_header Connection "";
+        proxy_set_header X-Api-Key "";
+        proxy_set_header Authorization "";
+        proxy_set_header Cookie "";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_intercept_errors on;
+        error_page 301 302 303 307 308 =502 @site_api_redirect;
+        proxy_pass ${BACKEND_ORIGIN}/api/submit-contact$is_args$args;
+    }
+
+    location = /api/newsletter-track {
+        if ($request_method != POST) {
+            return 405;
+        }
+        add_header Allow "POST" always;
+        client_max_body_size 32k;
+        limit_req zone=site_forms burst=5 nodelay;
+        proxy_read_timeout 20s;
+
+        proxy_set_header Host $proxy_host;
+        proxy_set_header Connection "";
+        proxy_set_header X-Api-Key "";
+        proxy_set_header Authorization "";
+        proxy_set_header Cookie "";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_intercept_errors on;
+        error_page 301 302 303 307 308 =502 @site_api_redirect;
+        proxy_pass ${BACKEND_ORIGIN}/api/newsletter-track$is_args$args;
+    }
+
+    location ^~ /api/ {
+        return 404;
+    }
+
+    location @site_api_redirect {
+        internal;
+        return 502;
+    }
+
+    # /api is a frontend page, not part of the /api/ namespace.
+    location = /api {
+        add_header Cache-Control "no-cache";
+        try_files /index.html =404;
+    }
+
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+        try_files $uri =404;
+    }
+
+    location ^~ /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        try_files $uri =404;
+    }
+
+    location ^~ /legacy/ {
+        try_files $uri =404;
+    }
+
+    # Raw URLs retained by migrated components point at the copied legacy files.
+    location ^~ /images/ {
+        alias /usr/share/nginx/html/legacy/images/;
+    }
+
+    location ^~ /svg/ {
+        alias /usr/share/nginx/html/legacy/svg/;
+    }
+
+    location ~ (^|/)\. {
+        return 404;
+    }
+
+    # Dotted paths are static files; missing assets must never receive SPA HTML.
+    location ~ \.[^/]+$ {
+        try_files $uri =404;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

@@ -2,15 +2,21 @@ import { createRootRoute, HeadContent, Link, Outlet } from '@tanstack/react-rout
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { Button } from '@/components/ui/button'
+import ClientProvider from '@/legacy/components/ClientProvider'
+import { ConfigProvider } from 'antd'
+import { Toaster } from '@/legacy/components/ui/toaster'
+import { Toaster as Sonner } from '@/legacy/components/ui/sonner'
 
 export const Route = createRootRoute({
   component: RootLayout,
   notFoundComponent: NotFound,
+  head: () => ({ meta: [{ title: 'פלטפורמת נתוני אנרגיה פתוחה - NZO' }] }),
 })
 
 function RootLayout() {
   return (
-    <>
+    <ClientProvider>
+      <ConfigProvider direction="rtl" theme={{ token: { fontFamily: 'Heebo, Arial, sans-serif' } }}>
       <HeadContent />
       <a href="#main-content" className="skip-link">דילוג לתוכן הראשי</a>
       <Header />
@@ -18,7 +24,10 @@ function RootLayout() {
         <Outlet />
       </main>
       <Footer />
-    </>
+      <Toaster />
+      <Sonner />
+      </ConfigProvider>
+    </ClientProvider>
   )
 }
 

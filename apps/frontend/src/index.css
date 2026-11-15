@@ -1,7 +1,36 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "./legacy/styles/theme.css";
+
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --font-sans: "Heebo", Arial, sans-serif;
+  --font-heebo: "Heebo", Arial, sans-serif;
+  --color-chart-1: hsl(12 76% 61%);
+  --color-chart-2: hsl(173 58% 39%);
+  --color-chart-3: hsl(197 37% 24%);
+  --color-chart-4: hsl(43 74% 66%);
+  --color-chart-5: hsl(27 87% 67%);
+  --color-renewable: hsl(72 87% 40%);
+  --color-solar: hsl(35 91% 65%);
+  --color-wind: hsl(200 84% 55%);
+  --color-gas: hsl(220 9% 46%);
+  --color-coal: hsl(0 0% 20%);
+  --color-energy-other-primary: var(--energy-other-primary);
+  --color-energy-renewable: var(--energy-renewable);
+  --color-energy-fossil: var(--energy-fossil);
+  --color-energy-co2-emissions: var(--energy-co2-emissions);
+  --color-energy-pumped-storage: var(--energy-pumped-storage);
+  --color-energy-other: var(--energy-other);
+  --color-energy-photovoltaic: var(--energy-photovoltaic);
+  --color-energy-biogas: var(--energy-biogas);
+  --color-energy-wind: var(--energy-wind);
+  --color-energy-solar-thermal: var(--energy-solar-thermal);
+  --color-energy-pv-storage: var(--energy-pv-storage);
+  --color-energy-coal: var(--energy-coal);
+  --color-energy-diesel: var(--energy-diesel);
+  --color-energy-natural-gas: var(--energy-natural-gas);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -32,7 +61,7 @@
   --card: #fdfbf6;
   --primary: #1e8025;
   --radius: 0.75rem;
-  font-family: var(--font-sans);
+  font-family: "Heebo", Arial, sans-serif;
   color: var(--foreground);
   background: var(--background);
   color-scheme: light;
@@ -45,6 +74,7 @@
 @layer base {
   * { @apply border-border; }
   body { margin: 0; min-width: 320px; }
+  [id] { scroll-margin-top: 10rem; }
   button:not(:disabled), a { -webkit-tap-highlight-color: transparent; }
   button:not(:disabled) { cursor: pointer; }
   a:focus-visible, button:focus-visible, input:focus-visible {
@@ -59,6 +89,14 @@
 
 #root { display: flex; flex-direction: column; min-height: 100svh; }
 .container { max-width: 1440px; }
+.chart-container { width: 100%; height: 24rem; }
+.chart-container-small { width: 100%; height: 16rem; }
+.nav-active { background: #1e8025; color: white; }
+.recharts-yAxis .recharts-cartesian-axis-tick text { text-anchor: start; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #fff; }
+::-webkit-scrollbar-thumb { background: #c3c3c3; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #1e8025; }
 .skip-link {
   position: fixed;
   inset-block-start: 0.5rem;

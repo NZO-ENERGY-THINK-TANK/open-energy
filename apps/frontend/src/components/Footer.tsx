@@ -11,9 +11,9 @@ export default function Footer() {
                 אודותינו
               </Link>
               <span aria-hidden="true">|</span>
-              <span aria-disabled="true" className="cursor-not-allowed text-slate-500">
-                תקנון ומדיניות פרטיות <span className="text-xs">(בקרוב)</span>
-              </span>
+              <Link to="/terms" className="rounded hover:underline focus-visible:outline-2 focus-visible:outline-offset-4">
+                תקנון ומדיניות פרטיות
+              </Link>
             </nav>
             <p className="w-full text-center text-base font-medium md:text-left">© מרכז השל לקיימות 2026.</p>
           </div>

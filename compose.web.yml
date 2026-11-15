@@ -1,0 +1,25 @@
+# Combine with docker-compose.yml to retain the existing postgres service.
+# Secrets enter containers only at runtime; none are frontend build arguments.
+services:
+  backend:
+    build:
+      context: ./apps/backend
+    env_file:
+      - ./apps/backend/.env
+    expose:
+      - "8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    env_file:
+      - ./apps/backend/.env
+    environment:
+      BACKEND_ORIGIN: http://backend:8000
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    restart: unless-stopped

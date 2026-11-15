@@ -1,2 +1,4 @@
 packages:
   - apps/*
+minimumReleaseAgeExclude:
+  - react-resizable-panels@4.23.0

@@ -6,6 +6,7 @@ import os
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
+from app.api import site
 from app.api.v1 import api_catalog
 from app.api.v1 import data_files
 from app.api.v1 import energy
@@ -48,13 +49,15 @@ _notifier_task: asyncio.Task | None = None
 @app.middleware("http")
 async def internal_api_key_guard(request, call_next):
     """
-    Enforce INTERNAL_API_KEY for all routes without exposing it in docs.
+    Enforce INTERNAL_API_KEY except public docs and exact website form POSTs.
     """
     # Allow public docs and OpenAPI schema.
     if request.method == "OPTIONS":
         return await call_next(request)
     path = request.url.path
     if path.startswith(("/docs", "/openapi.json", "/redoc")):
+        return await call_next(request)
+    if request.method == "POST" and path in site.PUBLIC_FORM_PATHS:
         return await call_next(request)
 
     expected = os.getenv("INTERNAL_API_KEY")
@@ -89,6 +92,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(site.router)
 # Delivery 1
 app.include_router(energy_overview.router, prefix="/api/v1")
 app.include_router(energy.router, prefix="/api/v1")
