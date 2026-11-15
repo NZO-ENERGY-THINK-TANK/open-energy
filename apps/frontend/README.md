@@ -1,75 +1,48 @@
-# React + TypeScript + Vite
+# Open Energy frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19, TypeScript, Vite, Tailwind CSS 4, TanStack Router, and Radix-based shadcn/ui components.
 
-Currently, two official plugins are available:
+## Initial scope
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Home page (`/`): original hero, topic navigation, data-section shell, and external resources.
+- About page (`/about`): original organization information and contact details.
+- Shared responsive header/footer, Hebrew RTL layout, Heebo typography, and a not-found view.
 
-## React Compiler
+The original application remains untouched in `old-nextjs`. Its public assets are copied under `public/legacy` to avoid overwriting scaffold assets.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Charts, search, dashboard routes, contact submission, and newsletter tracking are not connected yet. Deferred navigation is visibly disabled and labeled “בקרוב”. Data panels explicitly state that live data is unavailable. No backend credentials or simulated submissions are included.
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+From the monorepo root, install dependencies and start the frontend:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+pnpm install
+pnpm dev:frontend
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Use a supported Node.js LTS release compatible with the installed Vite version. Dependency installation updates the root lockfile; commit that updated lockfile after verifying the application.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+TanStack Router generates `src/routeTree.gen.ts` from `src/routes` when Vite starts. Do not edit the generated file manually.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+pnpm build:frontend
+pnpm lint:frontend
+pnpm typecheck:frontend
 ```
+
+The build runs Vite before TypeScript so the route tree exists on the first build. Standalone type checking requires a prior Vite start or build to generate the route tree.
+
+## Hosting
+
+Deploy the generated `dist` directory as a static SPA. Configure the production server to return `index.html` for frontend route requests such as `/about` without intercepting API requests or missing asset requests. Vite's development fallback does not configure production hosting.
+
+The Heebo font currently loads from Google Fonts, which makes third-party requests from visitors' browsers. Self-host it before deployment if required by the site's privacy policy or offline requirements.
+
+## UI conventions
+
+- Use `@/` imports for `src` modules.
+- Keep the existing brand palette, Hebrew copy, RTL behavior, and responsive layout.
+- `components.json` configures shadcn/ui for Vite and Tailwind 4, with React Server Components disabled.
+- Add React Hook Form, Zod, and TanStack Query when migrating the first actual forms and API-backed sections; this UI-only milestone does not need them yet.
+- Keep secrets server-side. Variables prefixed with `VITE_` are public.

@@ -62,6 +62,12 @@ Vite replaces the frontend build system, not the Next.js server routes. The exis
 
 The Vite application has been scaffolded with TanStack Router and shadcn/ui. Start with a small, reviewable UI slice rather than migrating every dashboard at once.
 
+### Implementation status
+
+The initial UI is implemented in `apps/frontend`: file-based home and about routes, a shared responsive header/footer, a not-found view, Tailwind 4 brand tokens, and shadcn/ui button infrastructure. The home page retains its hero, images, resource links, and data-section layout; charts remain explicitly unavailable rather than showing fabricated data. Deferred navigation is disabled and labeled. The original `old-nextjs` remains unchanged.
+
+Dependencies have been declared but still need installation with pnpm. No shell commands were run during setup. Build, lint, browser behavior, responsive appearance, and production route fallbacks remain unverified. TanStack Router generates its route tree on the first Vite start or build.
+
 ### First milestone
 
 - [ ] **Shared application shell:** Port the existing header, footer, navigation, content container, and required providers from `old-nextjs/app/layout.tsx` and its components. Use a TanStack Router root layout with an outlet.
