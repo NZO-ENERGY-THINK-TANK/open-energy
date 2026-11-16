@@ -1,6 +1,6 @@
 import { HeadContent, Outlet } from "@tanstack/react-router";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import Header from "@/routes/(layout)/-Header";
+import Footer from "@/routes/(layout)/-Footer";
 import { ConfigProvider } from "antd";
 import ClientProvider from "@/components/provider/ClientProvider";
 

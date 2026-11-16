@@ -135,7 +135,7 @@
 }
 
 #root { display: flex; flex-direction: column; min-height: 100svh; }
-.container { max-width: var(--container); }
+
 
 .market-container {
   max-width: var(--container);
