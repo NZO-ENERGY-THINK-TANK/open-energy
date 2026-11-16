@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "dev": "pnpm --parallel --filter frontend --filter backend dev",
     "build:frontend": "pnpm --filter frontend build",
     "lint:frontend": "pnpm --filter frontend lint",
     "typecheck:frontend": "pnpm --filter frontend typecheck"
