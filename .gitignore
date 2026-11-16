@@ -19,3 +19,5 @@ venv/
 !/data_files/Delivery_4_Diagram_2_International.csv
 
 node_modules
+
+ignore

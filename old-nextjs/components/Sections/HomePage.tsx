@@ -14,7 +14,6 @@ import {
 import { LEVEL2_HEBREW_COLORS } from "@/lib/colors";
 import { getDieselFromNonRenewablesLevel2 } from "@/lib/energyMixFossilDiesel";
 import image2 from "@/public/Frame 427319913.png";
-import image3 from "@/public/Frame 427319914.png";
 import image1 from "@/public/Frame 427319915.png";
 import newImage from "@/public/images/main_img.jpg";
 
@@ -33,7 +32,6 @@ import InterestPage from "../InterestPage";
 import Market from "../Market";
 import RejectionChart from "../RejectionChart";
 import SMP from "../SMP";
-import TooltipInfo from "../TooltipInfo";
 
 // Shared chart height so both overview (line) and energy mix (pie) cards match Figma
 const HOME_CHART_HEIGHT = 400;
