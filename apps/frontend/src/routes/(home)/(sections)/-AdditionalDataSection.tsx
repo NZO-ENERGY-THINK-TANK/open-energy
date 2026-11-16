@@ -1,4 +1,5 @@
 import { useId, useState } from 'react'
+import Market from '@/features/private-supplier-market/Market'
 
 const tabs = [
   { value: 'market', label: 'שוק מספקי חשמל פרטיים' },
@@ -57,7 +58,7 @@ export default function AdditionalDataSection() {
             aria-labelledby={`${id}-market-button`}
             hidden={activeTab !== 'market'}
           >
-            {/* TODO: Migrate Market, DashChart, and RejectionChart here. */}
+            {activeTab === 'market' && <Market />}
           </div>
 
           <div
