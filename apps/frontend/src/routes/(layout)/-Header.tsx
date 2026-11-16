@@ -149,12 +149,19 @@ export default function Header() {
               </div>
             </div>
 
-            {showTopics && (
-              <nav aria-label="נושאי נתוני אנרגיה" className="mt-2 hidden flex-row-reverse items-center gap-4 md:flex">
+            <nav
+              aria-label="נושאי נתוני אנרגיה"
+              aria-hidden={!showTopics}
+              inert={!showTopics}
+              className={`hidden flex-row-reverse items-center justify-start gap-4 overflow-hidden transition-all duration-500 ease-in-out motion-reduce:transition-none md:flex ${
+                showTopics
+                  ? 'mt-2 max-h-20 translate-y-0 opacity-100'
+                  : 'pointer-events-none mt-0 max-h-0 -translate-y-2 opacity-0'
+              }`}
+            >
                 {topics.map((topic) => (
                   <Link
-                    key={topic.label
-}
+                    key={topic.label}
                     to={topic.to}
                     hash={topic.hash}
                     aria-current={isTopicActive(topic) ? 'location' : undefined}
@@ -167,13 +174,12 @@ export default function Header() {
                     {topic.label}
                   </Link>
                 ))}
-              </nav>
-            )}
+            </nav>
           </div>
         </div>
 
         <nav
- id={menuId}
+          id={menuId}
           ref={menuRef}
           aria-label="ניווט לנייד"
           hidden={!isMenuOpen}
