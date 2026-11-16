@@ -2,7 +2,7 @@
 
 ## Goal
 
-Port the complete existing Next.js site into a maintainable React/Vite frontend in small, reviewable steps. Preserve the site's appearance, content, URLs, data, and behavior. This is a port, not a redesign or feature-development project.
+Port the finished functionality of the existing Next.js site into a maintainable React/Vite frontend in small, reviewable steps. Preserve its appearance, content, URLs, data, and behavior within the agreed scope below. This is a port, not a redesign or feature-development project.
 
 The repository remains a pnpm monorepo:
 
@@ -10,7 +10,17 @@ The repository remains a pnpm monorepo:
 - `apps/frontend`: the Vite application. Its existing implementation may be reorganized or replaced as needed.
 - `old-nextjs`: the read-only source of truth for UI, behavior, assets, and data.
 
-The deliverable is a working local development environment and a fully ported frontend. AWS deployment is not part of this work.
+The deliverable is a working local development environment and a frontend port of the agreed scope. AWS deployment is not part of this work.
+
+## Agreed scope and exceptions
+
+- Drop unfinished legacy functionality rather than completing it. Inventory and present any additional proposed exclusions to the user before removal; do not classify working functionality as unfinished because its migration is difficult or its environment is unavailable.
+- Do not restore the missing home-page electricity dashboard from `old-nextjs/components/Sections/Main Content.txt`. Omit its dormant hooks and remove links that would target the absent section; preserve the finished home-page sections.
+- Do not implement a search engine or retain the old fixed cards as real results. Keep `/search/result` as an explicitly labeled TODO destination explaining that search is not implemented. This is an approved exception to the no-permanent-placeholder rule.
+- Keep the usage-survey popup and its existing Google Apps Script integration. Use descriptive frontend naming such as `UsageSurveyPopup`, not newsletter terminology. Keep the legacy backend endpoint and environment-variable names unchanged.
+- Existing Python form validation takes precedence over legacy frontend validation. Adapt the frontend to those limits without changing Python.
+- Preserve existing SEO metadata where possible. Reduced crawler/indexing behavior from client rendering is accepted; new SEO infrastructure is out of scope.
+- Before correcting legacy bugs, API documentation, or other user-visible behavior beyond these agreed exceptions, present the specific proposed changes in chat and obtain approval. Necessary framework adaptations must not silently alter behavior.
 
 ## Non-negotiable boundaries
 
@@ -19,7 +29,7 @@ The deliverable is a working local development environment and a fully ported fr
 - Do not redesign pages, rewrite copy, change calculations, replace datasets, or invent behavior.
 - Copy existing assets and data files using file-copy tools or commands. Never retype CSV, JSON datasets, images, fonts, or other existing file contents into generated source.
 - Do not embed CSV or large datasets in TypeScript components. Preserve source files and load them through the appropriate asset or data interface.
-- Do not fabricate live data, simulate successful submissions, or hide broken features behind permanent placeholders.
+- Do not fabricate live data, simulate successful submissions, or hide broken features behind permanent placeholders. The explicit search TODO and documented usage-survey integration TODO are approved exceptions, not claims of working functionality.
 - Do not add deployment infrastructure, production proxies, Docker changes, CI changes, SSR, TanStack Start, or a replacement full-stack framework.
 - Root workspace scripts and the shared lockfile may change only as required for the frontend workflow. Avoid unrelated repository changes.
 - If parity requires a backend change, report the exact mismatch and stop that affected task. Do not silently work around it by changing behavior.
@@ -71,11 +81,25 @@ Keep integration simple and leave backend authentication unchanged for this migr
 - No new backend proxy service or production authentication architecture is required. Removing the legacy secret is future work.
 - Vite's development proxy is local tooling only. `vite preview` and a static production host are not replacements for it.
 
-### Contact and newsletter
+### Contact and usage survey
 
-Preserve the Google Apps Script integrations and the existing frontend submission behavior. Use the already implemented Python handlers at `/api/submit-contact` and `/api/newsletter-track`; do not create replacement handlers or edit Python code.
+Use the already implemented Python handlers in `apps/backend/app/api/site.py`; do not create replacement handlers or edit Python code:
 
-Document the existing backend configuration requirements, including `GOOGLE_CONTACT_SCRIPT_URL` and `GOOGLE_NEWSLETTER_SCRIPT_URL`, without committing secrets or altering backend files. Check the actual request/response contracts against the old frontend before wiring forms. Report any incompatibility instead of changing the feature.
+- Contact: page `/contact`, reference UI `old-nextjs/components/Sections/ContactSection.tsx`, submission `POST /api/submit-contact`.
+- Usage survey: reference UI `old-nextjs/components/NewsletterPopup.tsx`, submission `POST /api/newsletter-track`. Despite the legacy names, this asks why visitors use the site; it does not collect email addresses or subscribe users to a newsletter.
+
+Preserve the Google Apps Script integration path: browser, development proxy, Python validation, then Google Apps Script. Existing Python validation is authoritative, including contact field limits and accepted survey reasons. Report remaining incompatibilities instead of altering Python or inventing behavior.
+
+Rename migrated frontend components and helpers to describe a usage survey. Preserve `/api/newsletter-track`, `GOOGLE_NEWSLETTER_SCRIPT_URL`, and the existing `newsletter-submitted` session-storage key for compatibility. Preserve the current non-blocking survey dismissal behavior; closing the popup is not evidence that Google recorded a response. Do not introduce a new consent-management system or claim this popup implements one.
+
+Add an explicit TODO near the migrated survey integration and in local setup documentation. It must explain:
+
+- A deployed Google Apps Script that accepts the survey's `{ reason: 1..5 }` JSON is required; its actual behavior must be checked rather than invented.
+- The backend environment must supply `GOOGLE_NEWSLETTER_SCRIPT_URL` using an Apps Script deployment URL of the form `https://script.google.com/macros/s/<deployment-id>/exec`. Contact uses `GOOGLE_CONTACT_SCRIPT_URL` separately.
+- Verify deployment access permissions, Python-to-Google delivery, and actual recording in the intended Google destination with user approval before sending a live test submission.
+- The integration's configuration and end-to-end recording are currently unverified. Python accepts a Google HTTP 2xx response as delivery success without checking that a record was saved.
+
+Document these requirements without committing secrets or altering backend files. Use mocked success/failure checks during migration. The survey may retain this clearly documented integration TODO at acceptance; do not claim live Google recording is validated unless an approved check proves it.
 
 ## Design and behavior parity
 
@@ -84,12 +108,12 @@ Preserve:
 - Hebrew copy, `lang="he"`, RTL direction, Heebo typography, brand tokens, spacing, backgrounds, and responsive layouts.
 - Header, footer, desktop/mobile navigation, image aspect ratios, alt text, and public asset URLs where relevant.
 - Charts, legends, tooltips, date controls, filters, calculations, units, CSV exports, and loading/empty/error states.
-- Search behavior, URL query parameters, browser back/forward behavior, and existing internal/external links.
-- Contact/newsletter validation, submission outcomes, and Google integrations.
+- URL query parameters, browser back/forward behavior, and existing internal/external links for retained functionality. Search is limited to its approved TODO destination; links to dropped functionality must not remain misleading.
+- Contact and usage-survey integrations, subject to authoritative Python validation and the documented survey exception.
 
 Replace Next.js links, images, fonts, navigation, and metadata with Vite-compatible equivalents. Keep transformations narrowly focused on removing framework coupling.
 
-During an unfinished milestone, explicitly label unavailable destinations or features. Temporary placeholders do not count as a completed port and must be removed before final acceptance.
+During an unfinished milestone, explicitly label unavailable destinations or features. Temporary migration placeholders do not count as a completed port and must be removed before final acceptance, except for the approved search TODO and documented usage-survey integration TODO. Record dropped legacy functionality separately from incomplete migration work.
 
 ## Indexing findings and rendering limits
 
@@ -101,7 +125,7 @@ Inspection of `old-nextjs/app/layout.tsx` found shared Next.js metadata:
 
 Preserve these values in the Vite HTML document. Source inspection found no dedicated robots or sitemap files, and no explicit per-page metadata, canonical links, Open Graph, Twitter metadata, or structured-data implementation in the searched source.
 
-The original Next.js runtime can provide rendered HTML; the Vite SPA initially serves an application shell. Preserving metadata does not guarantee identical crawler behavior or indexing. Do not add SSR or prerendering silently. Record this rendering difference for review; deployment-time SEO work remains outside the current local migration.
+The original Next.js runtime can provide rendered HTML; the Vite SPA initially serves an application shell. Preserving metadata does not guarantee identical crawler behavior or indexing. Do not add SSR or prerendering silently. This rendering/indexing difference is explicitly accepted. Preserve the existing metadata, Hebrew language, and document direction where possible; identical SEO behavior is not an acceptance requirement. New SEO work and deployment-time SEO remain outside this migration.
 
 ## Current state: audit, do not assume completion
 
@@ -117,7 +141,7 @@ The previous plan's home/about-only and uninstalled-dependencies status is stale
 - Map existing frontend code against that inventory. Record missing behavior, duplicated code, embedded datasets, and known blockers.
 - Identify which existing data files and assets must be copied unchanged. Record source and destination paths.
 - Run available frontend checks to establish the baseline. Distinguish existing failures from migration regressions.
-- Produce a route/feature parity checklist that later tasks can reference.
+- Produce a route/feature parity checklist that later tasks can reference. Classify entries as retained, explicitly dropped, approved TODO, or blocked. Present additional unfinished-feature exclusions and proposed bug/documentation fixes to the user before acting.
 
 ### 2. Frontend foundation and local workflow
 
@@ -131,7 +155,7 @@ The previous plan's home/about-only and uninstalled-dependencies status is stale
 
 - Port header, footer, responsive navigation, root layout, and not-found behavior.
 - Complete `/`, `/about`, and `/terms`, including their required shared sections and components.
-- Preserve real home-page data integrations; if a dependency is deferred, record it as incomplete rather than marking the page done.
+- Preserve finished home-page sections and their required integrations. Do not restore the missing electricity dashboard or retain its unused requests and dead section links.
 - Review desktop/mobile appearance and RTL before multiplying the pattern across other pages.
 
 ### 4. Data pages in small batches
@@ -142,22 +166,24 @@ Port the remaining domains in dependency-aware batches:
 - `/emissions`
 - `/climate`
 - `/predictions`
-- `/search/result`
+
+Keep `/search/result` reachable as the approved explicit TODO destination. Do not build search or present the legacy fixed cards as real results.
 
 For each batch, copy required assets/data unchanged, adapt framework imports, connect real requests, and validate charts, filters, query parameters, and exports before marking it complete. Shared chart/filter components must have one owner when agents run in parallel.
 
 ### 5. Forms and API-information pages
 
-- Port `/contact` and newsletter interactions against the existing Python handlers and Google integrations.
-- Port `/api` and `/api-docs`, preserving examples, links, downloads, and content.
-- Verify actual submission failures and success handling. Do not send real Google submissions during automated tests; mock the integration boundary and perform live checks only with explicit approval.
+- Port `/contact` against the existing Python handler, aligning frontend validation with Python's existing contract.
+- Port the usage-survey popup with descriptive frontend naming, its existing endpoint, and the required configuration/verification TODO. Preserve its non-blocking dismissal behavior without claiming successful recording.
+- Port `/api` and `/api-docs`, preserving examples, links, downloads, and content unless the user approves specific corrections presented in chat first.
+- Verify submission success/failure handling with mocked responses, including survey HTTP/network failure and session behavior. Do not send real Google submissions during automated tests; perform live checks only with explicit approval.
 
 ### 6. Full parity review and cleanup
 
-- Reconcile every inventoried route and feature against the reference application.
-- Remove temporary placeholders, unused scaffold/demo code, unused dependencies, and remaining Next.js runtime imports.
+- Reconcile every inventoried route and feature against the agreed scope, approved exclusions, and TODO exceptions.
+- Remove temporary migration placeholders, unused scaffold/demo code, unused dependencies, and remaining Next.js runtime imports. Retain the approved search TODO and usage-survey integration TODO.
 - Verify lint, format-check, type-check, production build, and targeted tests.
-- Review representative desktop/mobile widths, RTL, navigation, charts, forms, search, downloads, assets, and browser console/network errors.
+- Review representative desktop/mobile widths, RTL, navigation, retained charts/forms, the search TODO destination, survey session behavior, downloads, assets, and browser console/network errors.
 - Document local setup, commands, configuration, known limitations, and the deferred production API/SPA-hosting decisions.
 
 ## Agent execution rules
@@ -179,10 +205,12 @@ Require small reviewable batches. An agent must report what it copied, changed, 
 
 ## Final acceptance
 
-- All 11 original page paths work, including direct local loads and browser back/forward navigation.
-- Existing UI, content, assets, datasets, and user-visible behavior are preserved.
-- Charts, filters, searches, downloads, and forms work against the existing contracts.
-- No manually recreated datasets, fabricated live values, fake submission success, or permanent migration placeholders remain.
+- All 11 original page paths resolve locally, including direct loads and browser back/forward navigation. `/search/result` explicitly displays its approved TODO, not working search results. Any further route exclusions require user review.
+- Existing UI, content, assets, datasets, and user-visible behavior are preserved for retained functionality, subject to the agreed exceptions and approved corrections.
+- Retained charts, filters, downloads, and forms use the existing contracts. Python form validation takes precedence; no search implementation or restoration of the missing home dashboard is required.
+- The usage survey has descriptive frontend naming, preserves its legacy backend contract, and includes the required setup/verification TODO. Mocked behavior is tested; live Google delivery and recording are reported separately as verified or unverified.
+- No manually recreated datasets, fabricated live values, fake submission success, or unapproved permanent migration placeholders remain. The search TODO and documented survey integration TODO are explicit exceptions.
+- Existing basic SEO metadata is preserved where possible. Client-rendering-related SEO differences are accepted; identical indexing is not required.
 - Shared components and feature boundaries keep route files understandable and avoid duplicated logic.
 - Frontend lint, format-check, type-check, build, and added targeted tests pass; browser checks are reported separately.
 - No backend changes, source-reference changes, bundled secrets, or Next.js runtime dependency remain.
