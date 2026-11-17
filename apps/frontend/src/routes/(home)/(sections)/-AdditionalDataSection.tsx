@@ -1,5 +1,6 @@
 import { useId, useState } from 'react'
 import Market from '@/features/private-supplier-market/Market'
+import SMP from '@/features/smp/SMP'
 
 const tabs = [
   { value: 'market', label: 'שוק מספקי חשמל פרטיים' },
@@ -67,7 +68,7 @@ export default function AdditionalDataSection() {
             aria-labelledby={`${id}-smp-button`}
             hidden={activeTab !== 'smp'}
           >
-            {/* TODO: Migrate SMP and Electritiy here. */}
+            {activeTab === 'smp' && <SMP />}
           </div>
         </div>
       </div>

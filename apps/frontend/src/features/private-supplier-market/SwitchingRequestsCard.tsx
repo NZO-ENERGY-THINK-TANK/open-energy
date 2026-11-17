@@ -3,7 +3,7 @@ import { exportSwitchingRequests, useSwitchingRequests } from './api'
 import SwitchingRequestsChart from './charts/SwitchingRequestsChart'
 import MarketCard from './MarketCard'
 import { CustomerFilter, MultiSelectFilter, SupplierFilter } from './MarketFilters'
-import QueryContent from './QueryContent'
+import QueryContent from '../../components/data/QueryContent'
 import type { CustomerType } from './types'
 
 export default function SwitchingRequestsCard({ availableYears }: { availableYears: number[] }) {

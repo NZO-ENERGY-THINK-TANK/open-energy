@@ -4,7 +4,7 @@ import RejectionReasonsChart from './charts/RejectionReasonsChart'
 import MarketCard from './MarketCard'
 import { CustomerFilter, MultiSelectFilter, SupplierFilter } from './MarketFilters'
 import { rejectionReasons } from './constants'
-import QueryContent from './QueryContent'
+import QueryContent from '../../components/data/QueryContent'
 import type { CustomerType, RejectionReason } from './types'
 
 export default function RejectionReasonsCard({ availableYears }: { availableYears: number[] }) {

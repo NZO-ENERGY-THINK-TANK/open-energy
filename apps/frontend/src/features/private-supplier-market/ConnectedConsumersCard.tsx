@@ -2,7 +2,7 @@ import { exportConnectedConsumers, useConnectedConsumers } from './api'
 import ConnectedConsumersChart from './charts/ConnectedConsumersChart'
 import MarketCard from './MarketCard'
 import { CustomerFilter } from './MarketFilters'
-import QueryContent from './QueryContent'
+import QueryContent from '../../components/data/QueryContent'
 
 export default function ConnectedConsumersCard() {
   const query = useConnectedConsumers()
