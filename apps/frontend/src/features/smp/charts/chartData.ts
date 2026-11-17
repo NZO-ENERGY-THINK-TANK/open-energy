@@ -130,6 +130,22 @@ export function getProductionComparisonView(data: ProductionVsMarginalPriceRespo
   }, true)
 }
 
+export function getProductionCorrelationView(data: ProductionVsMarginalPriceResponse) {
+  const days = (Date.parse(data.end_date) - Date.parse(data.start_date)) / 86_400_000
+  const timeView = getProductionComparisonView(data)
+  const rows = days < 62
+    ? rawRows(data.correlation_by_view?.day?.length ? data.correlation_by_view.day : data.combined_series)
+    : aggregateRows(days < 730 ? data.correlation_by_view?.month : data.correlation_by_view?.year)
+
+  return rows.length ? {
+    ...timeView,
+    rows,
+    view: days < 62 ? 'half-hour' as const : days < 730 ? 'monthly' as const : 'yearly' as const,
+    requested: days < 62 ? 'half-hour' as const : days < 730 ? 'monthly' as const : 'yearly' as const,
+    generationUnit: days < 62 ? 'MW' : 'MWh',
+  } : timeView
+}
+
 export function periodLabel(period: string): string {
   // Format the literal source-local components, independent of browser timezone.
   const [date, time] = period.split('T')

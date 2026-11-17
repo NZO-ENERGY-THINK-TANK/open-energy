@@ -2,14 +2,16 @@ import { useMemo, useState } from 'react'
 
 import type { ProductionVsMarginalPriceResponse } from '../types'
 import ChartPanel from './ChartPanel'
-import { getProductionComparisonView, viewDescription } from './chartData'
+import { getProductionComparisonView, getProductionCorrelationView, viewDescription } from './chartData'
 import { scatterOption, timeOption } from './chartOptions'
 
 export type ProductionVsMarginalPriceChartProps = { data: ProductionVsMarginalPriceResponse }
 
 export default function ProductionVsMarginalPriceChart({ data }: ProductionVsMarginalPriceChartProps) {
   const [mode, setMode] = useState<'time' | 'scatter'>('time')
-  const { rows, view, requested, generationUnit } = useMemo(() => getProductionComparisonView(data), [data])
+  const { rows, view, requested, generationUnit } = useMemo(() => mode === 'scatter'
+      ? getProductionCorrelationView(data)
+      : getProductionComparisonView(data), [data, mode])
   const description = `${viewDescription(view, requested)}. השדה net_demand מייצג סך ייצור חשמל, לא ביקוש נטו. ${view === 'half-hour' ? 'הייצור הוא הספק ממוצע בכל חצי שעה (MW), בשעה המקומית של המקור.' : 'הייצור הוא סך האנרגיה בתקופה (MWh); המחירים הם ממוצעים שהוחזרו מהשרת.'} המחיר השולי כולל אילוצים נמדד ב־₪/MWh. ביקוש משקי הוא תווית התצוגה של סדרת הייצור. ${mode === 'scatter' ? 'ציר אופקי: מחיר שולי; ציר אנכי: ביקוש משקי. כל נקודה מצמידה ייצור ומחיר מאותו זמן או מאותה תקופה בלבד; זוגות חסרים אינם מוצגים.' : 'ציר אופקי: זמן; ציר שמאלי: מחיר שולי; ציר ימני: סך ייצור החשמל. ערכים חסרים נשארים פערים, לא אפסים.'}`
   const option = useMemo(() => mode === 'time'
     ? timeOption(rows, view, description, generationUnit)
