@@ -1,4 +1,4 @@
-import InterestSection from "@/routes/(home)/(sections)/-InterestSection";
+import InterestSection from "@/components/InterestSection";
 import AdditionalDataSection from "@/routes/(home)/(sections)/-AdditionalDataSection";
 import HeroSection from "@/routes/(home)/(sections)/-HeroSection";
 import UsageSurveyPopup from "@/features/usage-survey/UsageSurveyPopup";
