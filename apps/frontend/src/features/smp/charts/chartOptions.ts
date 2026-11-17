@@ -123,8 +123,30 @@ export function timeOption(
 }
 
 export function scatterOption(rows: ChartRow[], generationUnit: string, description: string): EChartsOption {
+  const points = rows.flatMap((row, index) => row.generation !== null && row.withConstraints !== null
+    ? [{ value: [row.withConstraints, row.generation, row.period], group: index % 2 }] : [])
+  const domain = (dimension: number, fallback: number): [number, number] => {
+    const values = points.map((point) => Number(point.value[dimension])).filter((value) => value > 0)
+    if (!values.length) return [0, fallback]
+    const min = Math.min(...values)
+    const max = Math.max(...values)
+    const padding = Math.max((max - min) * 0.1, max * 0.05)
+    return [Math.max(0, Math.floor(min - padding)), Math.ceil(max + padding)]
+  }
+  const [minPrice, maxPrice] = domain(0, 220)
+  const [minDemand, maxDemand] = domain(1, 12000)
+
   return {
     ...baseOption(description, true),
+    grid: { top: 50, left: 90, right: 20, bottom: 100 },
+    legend: {
+      bottom: 16, left: 40, icon: 'circle', itemWidth: 8, itemHeight: 8, itemGap: 24,
+      textStyle: { color: '#484C56', fontSize: 14 },
+    },
+    media: [{ query: { maxWidth: 600 }, option: {
+      grid: { left: 65, right: 20 },
+      legend: { left: 20, textStyle: { fontSize: 10 } },
+    } }],
     tooltip: {
       ...tooltipStyle, trigger: 'item',
       formatter: (params) => {
@@ -140,24 +162,27 @@ export function scatterOption(rows: ChartRow[], generationUnit: string, descript
     },
     xAxis: {
       type: 'value', name: '[₪]',
-      nameLocation: 'middle', nameGap: 35, nameTextStyle: axisName, scale: true,
+      nameLocation: 'middle', nameGap: 35, nameTextStyle: axisName,
+            min: minPrice, max: maxPrice, splitNumber: 4,
       axisLine, axisTick: { show: true }, splitLine,
       axisLabel: { color: '#666', fontSize: 12, formatter: (value: number) => numberFormat.format(value) },
     },
     yAxis: {
-      type: 'value', name: `[${generationUnit}]`, scale: true,
+      type: 'value', name: `[${generationUnit}]`, min: minDemand, max: maxDemand, splitNumber: 4,
       nameLocation: 'middle', nameGap: 60, nameTextStyle: axisName,
       axisLine, axisTick: { show: true }, splitLine,
       axisLabel: { color: '#666', fontSize: 12, formatter: (value: number) => numberFormat.format(value) },
     },
-    series: [{
-      name: 'מחיר שולי כולל אילוצים',
-      type: 'scatter', symbol: 'circle', symbolSize: 8,
-      itemStyle: { color: '#166534' },
-      // Keep real price/demand pairs; legacy split these arbitrarily into two series.
-      data: rows.flatMap((row) => row.generation !== null && row.withConstraints !== null
-        ? [[row.withConstraints, row.generation, row.period]] : []),
+    // Production alternates point colors; both groups still contain complete price/generation pairs.
+    series: [
+      { name: 'מחיר שולי כולל אילוצים', color: '#166534', group: 1 },
+      { name: 'ביקוש משקי', color: '#eab308', group: 0 },
+    ].map(({ name, color, group }) => ({
+      name, type: 'scatter' as const, symbol: 'circle', symbolSize: 8,
+      itemStyle: { color },
+      data: points.filter((point) => point.group === group).map((point) => point.value),
       encode: { x: 0, y: 1 },
-    }],
+      emphasis: { focus: 'series' as const },
+    })), 
   }
 }
