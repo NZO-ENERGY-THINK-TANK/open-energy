@@ -23,7 +23,7 @@ export default function ConnectedConsumersCard() {
         <CustomerFilter label="מגזר — פילוח מחוזי לא זמין" disabled />
         {query.data && <p className="text-sm text-[#59687D]">טווח נתונים: <bdi>{query.data.start_date} – {query.data.end_date}</bdi></p>}
       </div>
-      <QueryContent isPending={query.isPending} isError={query.isError} hasData={!!query.data} note={query.data?.note} onRetry={() => { void query.refetch() }}>
+      <QueryContent isPending={query.isPending} isError={query.isError} hasData={!!query.data} onRetry={() => { void query.refetch() }}>
         {query.data && <ConnectedConsumersChart data={query.data} />}
       </QueryContent>
     </MarketCard>

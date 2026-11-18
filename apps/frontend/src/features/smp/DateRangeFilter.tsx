@@ -25,7 +25,7 @@ export default function DateRangeFilter({ value, onChange }: { value: DateRange;
           format="DD/MM/YYYY"
           placeholder={['תאריך התחלה', 'תאריך סיום']}
           separator=" - "
-          suffixIcon={<ChevronDown className="size-4 stroke-[#59687D]" />}
+          suffix={<ChevronDown className="size-4 stroke-[#59687D]" />}
           allowClear={false}
           showNow={false}
         />
