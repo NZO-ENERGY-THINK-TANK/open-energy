@@ -37,7 +37,8 @@ export default function Header() {
       frame = undefined
     }
     const handleScroll = () => {
-      if (frame === undefined) frame = window.requestAnimationFrame(updateScroll)
+      if (frame === undefined)
+        frame = window.requestAnimationFrame(updateScroll)
     }
     updateScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -67,7 +68,6 @@ export default function Header() {
     }
   }, [isMenuOpen])
 
-
   const isTopicActive = (topic: (typeof topics)[number]) =>
     pathname === topic.to && (!topic.hash || hash === topic.hash)
 
@@ -80,7 +80,11 @@ export default function Header() {
       <div className="container mx-auto px-4 py-3 md:px-6">
         <div className="flex w-full flex-wrap items-center justify-between gap-3 md:flex-nowrap">
           <div className="flex items-center gap-3 md:gap-6">
-            <Link to="/" className="flex items-center" onClick={() => setIsMenuOpen(false)}>
+            <Link
+              to="/"
+              className="flex items-center"
+              onClick={() => setIsMenuOpen(false)}
+            >
               <Logo />
             </Link>
             <img
@@ -94,7 +98,10 @@ export default function Header() {
 
           <div className="flex flex-col items-end">
             <div className="flex items-center justify-between gap-4 md:gap-8">
-              <nav aria-label="ניווט ראשי" className="hidden items-center gap-8 md:flex">
+              <nav
+                aria-label="ניווט ראשי"
+                className="hidden items-center gap-8 md:flex"
+              >
                 {navItems.map((item) => (
                   <Link
                     key={item.to}
@@ -110,7 +117,6 @@ export default function Header() {
               </nav>
 
               <div className="flex items-center gap-3 md:gap-4">
-
                 <Button
                   ref={toggleRef}
                   type="button"
@@ -122,7 +128,11 @@ export default function Header() {
                   className="border border-white hover:bg-slate-700 hover:text-white md:hidden"
                   onClick={() => setIsMenuOpen((open) => !open)}
                 >
-                  {isMenuOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+                  {isMenuOpen ? (
+                    <X size={20} aria-hidden="true" />
+                  ) : (
+                    <Menu size={20} aria-hidden="true" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -137,21 +147,21 @@ export default function Header() {
                   : 'pointer-events-none mt-0 max-h-0 -translate-y-2 opacity-0'
               }`}
             >
-                {topics.map((topic) => (
-                  <Link
-                    key={topic.label}
-                    to={topic.to}
-                    hash={topic.hash}
-                    aria-current={isTopicActive(topic) ? 'location' : undefined}
-                    className={`relative mt-3 rounded-full border px-5 py-[6px] text-base font-bold text-white transition-colors hover:text-gray-200 ${
-                      isTopicActive(topic)
-                        ? 'border-[#1E8025] bg-[#1E8025]'
-                        : 'border-transparent bg-[linear-gradient(#2A2E33,#2A2E33),linear-gradient(180deg,#357A5B80,#C3D44A80)] [background-origin:border-box] [background-clip:padding-box,border-box]'
-                    }`}
-                  >
-                    {topic.label}
-                  </Link>
-                ))}
+              {topics.map((topic) => (
+                <Link
+                  key={topic.label}
+                  to={topic.to}
+                  hash={topic.hash}
+                  aria-current={isTopicActive(topic) ? 'location' : undefined}
+                  className={`relative mt-3 rounded-full border px-5 py-[6px] text-base font-bold text-white transition-colors hover:text-gray-200 ${
+                    isTopicActive(topic)
+                      ? 'border-[#1E8025] bg-[#1E8025]'
+                      : 'border-transparent bg-[linear-gradient(#2A2E33,#2A2E33),linear-gradient(180deg,#357A5B80,#C3D44A80)] [background-clip:padding-box,border-box] [background-origin:border-box]'
+                  }`}
+                >
+                  {topic.label}
+                </Link>
+              ))}
             </nav>
           </div>
         </div>
@@ -170,7 +180,9 @@ export default function Header() {
               aria-current={pathname === item.to ? 'page' : undefined}
               onClick={() => setIsMenuOpen(false)}
               className={`block w-full rounded px-4 py-2 text-base font-bold transition-colors hover:bg-slate-600 ${
-                pathname === item.to ? 'bg-slate-700 text-[#1E8025]' : 'text-white'
+                pathname === item.to
+                  ? 'bg-slate-700 text-[#1E8025]'
+                  : 'text-white'
               }`}
             >
               {item.label}

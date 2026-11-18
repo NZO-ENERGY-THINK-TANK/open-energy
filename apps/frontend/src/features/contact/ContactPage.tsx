@@ -11,7 +11,7 @@ export default function ContactPage() {
         alt=""
         className="pointer-events-none absolute top-0 left-0 -z-10 size-[600px] max-w-none"
       />
-      <div className="container relative mx-auto w-full px-5 py-10 md:py-[52px]">
+      <div className="relative container mx-auto w-full px-5 py-10 md:py-[52px]">
         <h1 className="text-3xl leading-tight font-extrabold text-[#484C56] md:text-[45px]">
           יצירת קשר
         </h1>

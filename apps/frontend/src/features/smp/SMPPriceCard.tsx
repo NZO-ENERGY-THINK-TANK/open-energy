@@ -10,7 +10,9 @@ import SMPSourceNotes from './SMPSourceNotes'
 export default function SMPPriceCard() {
   const [range, setRange] = useState(() => presetRange('last7Days'))
   const query = useSMP(range)
-  const effectiveRange = query.data ? { start: query.data.start_date, end: query.data.end_date } : undefined
+  const effectiveRange = query.data
+    ? { start: query.data.start_date, end: query.data.end_date }
+    : undefined
 
   return (
     <SMPChartCard
@@ -19,10 +21,16 @@ export default function SMPPriceCard() {
       sourceNotes={<SMPSourceNotes />}
       onExport={() => exportSMP(effectiveRange ?? range)}
       exportDisabled={!query.data || query.isPending}
-
     >
       <DateRangeFilter value={effectiveRange ?? range} onChange={setRange} />
-      <QueryContent isPending={query.isPending} isError={query.isError} hasData={!!query.data} onRetry={() => { void query.refetch() }}>
+      <QueryContent
+        isPending={query.isPending}
+        isError={query.isError}
+        hasData={!!query.data}
+        onRetry={() => {
+          void query.refetch()
+        }}
+      >
         {query.data && <SMPPriceChart data={query.data} />}
       </QueryContent>
     </SMPChartCard>

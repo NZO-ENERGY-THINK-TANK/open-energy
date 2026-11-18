@@ -7,6 +7,11 @@ export function useChartLegend() {
     hidden,
     hovered,
     onHover,
-    onToggle: (key: string) => setHidden((current) => current.includes(key) ? current.filter((item) => item !== key) : [...current, key]),
+    onToggle: (key: string) =>
+      setHidden((current) =>
+        current.includes(key)
+          ? current.filter((item) => item !== key)
+          : [...current, key],
+      ),
   }
 }

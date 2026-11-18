@@ -1,8 +1,8 @@
-import homeRenewableBackground from "@/assets/backgrounds/home-renewable.png";
-import InterestSection from "@/components/InterestSection";
-import AdditionalDataSection from "@/routes/(home)/(sections)/-AdditionalDataSection";
-import HeroSection from "@/routes/(home)/(sections)/-HeroSection";
-import UsageSurveyPopup from "@/features/usage-survey/UsageSurveyPopup";
+import homeRenewableBackground from '@/assets/backgrounds/home-renewable.png'
+import InterestSection from '@/components/InterestSection'
+import AdditionalDataSection from '@/routes/(home)/(sections)/-AdditionalDataSection'
+import HeroSection from '@/routes/(home)/(sections)/-HeroSection'
+import UsageSurveyPopup from '@/features/usage-survey/UsageSurveyPopup'
 
 export default function HomePage() {
   return (
@@ -15,11 +15,11 @@ export default function HomePage() {
         alt=""
       />
       <UsageSurveyPopup />
-      <div className="container mx-auto px-5 py-[52px] space-y-[52px] relative w-full overflow-hidden">
+      <div className="relative container mx-auto w-full space-y-[52px] overflow-hidden px-5 py-[52px]">
         <HeroSection />
         <AdditionalDataSection />
       </div>
       <InterestSection />
     </div>
-  );
+  )
 }

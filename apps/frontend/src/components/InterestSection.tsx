@@ -36,8 +36,7 @@ export default function InterestSection() {
         />
       </div>
 
-      <div className="container mx-auto px-
-5">
+      <div className="px- 5 container mx-auto">
         <div className="flex flex-col px-0 pb-10 md:px-[60px] md:pb-14">
           <div className="flex items-center justify-between px-2">
             <h2
@@ -70,7 +69,10 @@ export default function InterestSection() {
                     rel="noopener noreferrer"
                     aria-label={`למאמר: ${article.title} (נפתח בחלון חדש)`}
                   >
-                    למאמר <span aria-hidden="true" className="mr-2">&gt;</span>
+                    למאמר{' '}
+                    <span aria-hidden="true" className="mr-2">
+                      &gt;
+                    </span>
                   </a>
                 </Button>
               </li>

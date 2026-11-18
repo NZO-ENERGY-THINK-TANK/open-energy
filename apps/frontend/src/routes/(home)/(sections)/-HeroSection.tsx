@@ -25,26 +25,37 @@ export default function HeroSection() {
           <div className="my-3 mr-0 h-1 w-[46px] bg-[#276E4E] md:my-[18px]" />
 
           <p className="mr-0 mb-12 max-w-lg text-base leading-relaxed text-slate-700 md:text-xl">
-            פלטפורמה מרכזית למעקב אחר משק החשמל בישראל: נתונים עדכניים, מגמות ותובנות
-            לקידום מערכת חשמל מבוססת אנרגיה מתחדשת.
+            פלטפורמה מרכזית למעקב אחר משק החשמל בישראל: נתונים עדכניים, מגמות
+            ותובנות לקידום מערכת חשמל מבוססת אנרגיה מתחדשת.
           </p>
 
           <div className="mt-10 md:mt-20">
             <h2 className="mb-2 text-lg font-bold text-[#276E4E] md:mb-4 md:text-2xl">
               מה מעניין אותך?
             </h2>
-            <nav aria-label="נושאי נתוני אנרגיה" className="flex flex-wrap gap-2 md:gap-3">
+            <nav
+              aria-label="נושאי נתוני אנרגיה"
+              className="flex flex-wrap gap-2 md:gap-3"
+            >
               {/* TODO: Add the electricity-sector target when migrating the main content. */}
               <Button asChild variant="outline" className={topicLinkClassName}>
                 <a href="#electricity-sector">
-                  <Leaf size={32} aria-hidden="true" className="shrink-0 text-[#59687D]" />
+                  <Leaf
+                    size={32}
+                    aria-hidden="true"
+                    className="shrink-0 text-[#59687D]"
+                  />
                   <span className="font-medium">משק החשמל</span>
                 </a>
               </Button>
 
               <Button asChild variant="outline" className={topicLinkClassName}>
                 <Link to="/renewable-energy">
-                  <SolarPanel size={32} aria-hidden="true" className="shrink-0 text-[#59687D]" />
+                  <SolarPanel
+                    size={32}
+                    aria-hidden="true"
+                    className="shrink-0 text-[#59687D]"
+                  />
                   <span className="font-medium">אנרגיות מתחדשות</span>
                 </Link>
               </Button>
@@ -53,14 +64,22 @@ export default function HeroSection() {
 
               <Button asChild variant="outline" className={topicLinkClassName}>
                 <Link to="/climate">
-                  <CloudLightning size={32} aria-hidden="true" className="shrink-0 text-[#59687D]" />
+                  <CloudLightning
+                    size={32}
+                    aria-hidden="true"
+                    className="shrink-0 text-[#59687D]"
+                  />
                   <span className="font-medium">אקלים</span>
                 </Link>
               </Button>
 
               <Button asChild variant="outline" className={topicLinkClassName}>
                 <Link to="/predictions">
-                  <Scale size={32} aria-hidden="true" className="shrink-0 text-[#59687D]" />
+                  <Scale
+                    size={32}
+                    aria-hidden="true"
+                    className="shrink-0 text-[#59687D]"
+                  />
                   <span className="font-medium">תחזיות והשוואות</span>
                 </Link>
               </Button>

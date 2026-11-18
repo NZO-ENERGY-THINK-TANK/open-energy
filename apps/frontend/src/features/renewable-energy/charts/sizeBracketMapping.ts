@@ -7,40 +7,43 @@
 import type { BracketStat, ChartMetric } from '../types'
 
 export function pickBracketStat(raw: unknown, mode: ChartMetric) {
-  if (typeof raw === 'number') return mode === 'capacity' && Number.isFinite(raw) ? raw : 0
+  if (typeof raw === 'number')
+    return mode === 'capacity' && Number.isFinite(raw) ? raw : 0
   if (!raw || typeof raw !== 'object') return 0
   const value = raw as Exclude<BracketStat, number>
-  const number = Number(mode === 'count' ? value.count ?? value.facility_count : value.total_mw)
+  const number = Number(
+    mode === 'count' ? (value.count ?? value.facility_count) : value.total_mw,
+  )
   return Number.isFinite(number) ? number : 0
 }
 
-export type FourSegmentKey = "small" | "medium" | "large" | "xlarge";
+export type FourSegmentKey = 'small' | 'medium' | 'large' | 'xlarge'
 
-export type FourSegments = Record<FourSegmentKey, number>;
+export type FourSegments = Record<FourSegmentKey, number>
 
 export function normalizeBracketLabel(label: string): string {
   return label
-    .normalize("NFKC")
-    .replace(/[\u2013\u2014\u2212]/g, "-")
-    .replace(/\s+/g, " ")
+    .normalize('NFKC')
+    .replace(/[\u2013\u2014\u2212]/g, '-')
+    .replace(/\s+/g, ' ')
     .trim()
-    .toLowerCase();
+    .toLowerCase()
 }
 
 /** Map normalized `size_brackets` key → stack segment. */
 export function segmentKeyForBracketLabel(
   normalizedLabel: string,
 ): FourSegmentKey | null {
-  const s = normalizedLabel;
-  if (/\b5001\b/.test(s) || /5001\s*\+|\+\s*5001/.test(s)) return "xlarge";
-  if (s.includes("631") && s.includes("5000")) return "large";
-  if (s.includes("201") && s.includes("630")) return "medium";
-  if (s.includes("0-200")) return "small";
-  return null;
+  const s = normalizedLabel
+  if (/\b5001\b/.test(s) || /5001\s*\+|\+\s*5001/.test(s)) return 'xlarge'
+  if (s.includes('631') && s.includes('5000')) return 'large'
+  if (s.includes('201') && s.includes('630')) return 'medium'
+  if (s.includes('0-200')) return 'small'
+  return null
 }
 
 export function emptyFourSegments(): FourSegments {
-  return { small: 0, medium: 0, large: 0, xlarge: 0 };
+  return { small: 0, medium: 0, large: 0, xlarge: 0 }
 }
 
 /**
@@ -51,11 +54,11 @@ export function accumulateFourSegments(
   brackets: Record<string, unknown>,
   pick: (raw: unknown) => number,
 ): FourSegments {
-  const out = emptyFourSegments();
+  const out = emptyFourSegments()
   for (const [label, raw] of Object.entries(brackets)) {
-    const seg = segmentKeyForBracketLabel(normalizeBracketLabel(label));
-    if (!seg) continue;
-    out[seg] += pick(raw);
+    const seg = segmentKeyForBracketLabel(normalizeBracketLabel(label))
+    if (!seg) continue
+    out[seg] += pick(raw)
   }
-  return out;
+  return out
 }

@@ -18,8 +18,10 @@ export async function submitContact(payload: ContactPayload): Promise<void> {
 
   const acknowledgment: unknown = await response.json()
   if (
-    typeof acknowledgment !== 'object' || acknowledgment === null ||
-    !('ok' in acknowledgment) || acknowledgment.ok !== true
+    typeof acknowledgment !== 'object' ||
+    acknowledgment === null ||
+    !('ok' in acknowledgment) ||
+    acknowledgment.ok !== true
   ) {
     throw new Error('Invalid contact submission acknowledgment.')
   }

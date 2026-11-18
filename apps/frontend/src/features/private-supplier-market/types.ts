@@ -1,12 +1,10 @@
 export type CustomerType = 'residential' | 'non_residential'
 
-export type SupplierType = 'all' | 'virtual_suppliers' | 'suppliers_with_generation'
+export type SupplierType =
+  'all' | 'virtual_suppliers' | 'suppliers_with_generation'
 
 export type RejectionReason =
-  | 'missing_power_of_attorney'
-  | 'meter_issues'
-  | 'request_form_issues'
-  | 'other'
+  'missing_power_of_attorney' | 'meter_issues' | 'request_form_issues' | 'other'
 
 type MonthlyConsumerCount = {
   month: string
@@ -23,14 +21,20 @@ export type ConnectedConsumersResponse = {
     total_consumers: string
     new_additions: string
   }
-  data: Array<Omit<MonthlyConsumerCount, 'new_additions'> & { new_additions: number | null }>
+  data: Array<
+    Omit<MonthlyConsumerCount, 'new_additions'> & {
+      new_additions: number | null
+    }
+  >
   segments: {
     regulation_type: Array<MonthlyConsumerCount & { regulation_type: string }>
     sector: Array<MonthlyConsumerCount & { sector: string }>
     meter_type: Array<MonthlyConsumerCount & { meter_type: string }>
     district: Array<MonthlyConsumerCount & { district: string }>
     status?: Array<MonthlyConsumerCount & { status: string }>
-    rejection_reason?: Array<MonthlyConsumerCount & { rejection_reason: string }>
+    rejection_reason?: Array<
+      MonthlyConsumerCount & { rejection_reason: string }
+    >
   }
   district_meter_breakdown: Record<string, { smart?: number; basic?: number }>
   note: string | null
@@ -59,7 +63,10 @@ export type SwitchingRequestsResponse = {
   }
   monthly_requests: Array<{ month: string; requests: number }>
   monthly_rejections_by_reason: Array<
-    { month: string; total_rejections: number } & Record<RejectionReason, number>
+    { month: string; total_rejections: number } & Record<
+      RejectionReason,
+      number
+    >
   >
   total_requests: number
   total_rejections: number

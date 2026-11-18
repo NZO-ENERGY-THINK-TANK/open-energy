@@ -9,5 +9,5 @@ export default function Logo() {
       height={56}
       className="h-auto w-[60px] md:h-[56px] md:w-[140px]"
     />
-  );
+  )
 }

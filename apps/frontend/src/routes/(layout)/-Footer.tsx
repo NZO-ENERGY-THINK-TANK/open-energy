@@ -18,7 +18,9 @@ export default function Footer() {
               >
                 תקנון ומדיניות פרטיות
               </Link>
-              <span aria-hidden="true" className="text-sm text-slate-600">|</span>
+              <span aria-hidden="true" className="text-sm text-slate-600">
+                |
+              </span>
               <Link
                 to="/about"
                 className="text-sm text-slate-600 hover:text-slate-800"
@@ -41,11 +43,14 @@ export default function Footer() {
                 alt="Co-funded by the European Union"
               />
             </div>
-            <p lang="en" dir="ltr" className="text-right text-sm font-medium text-[#59687D]">
+            <p
+              lang="en"
+              dir="ltr"
+              className="text-right text-sm font-medium text-[#59687D]"
+            >
               This website was co-funded by the European Union. Its content is
               the sole responsibility of The Heschel Center for Sustainability,
               and does not necessarily reflect the views of the European Union
-
             </p>
             <div className="ml-0 flex w-full items-end justify-end gap-0 text-sm md:text-base">
               עיצוב ופיתוח ע״י

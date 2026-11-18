@@ -64,20 +64,29 @@ export default function UsageSurveyPopup() {
       await submitUsageReason(selectedReason)
       finishSurvey()
     } catch {
-      setError('לא ניתן לשלוח את התשובה כרגע. אפשר לנסות שוב או לסגור ולהמשיך לגלוש.')
+      setError(
+        'לא ניתן לשלוח את התשובה כרגע. אפשר לנסות שוב או לסגור ולהמשיך לגלוש.',
+      )
     } finally {
       setIsPending(false)
     }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!isPending) setIsOpen(open) }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!isPending) setIsOpen(open)
+      }}
+    >
       <DialogContent
         dir="rtl"
         showCloseButton={false}
         overlayClassName="bg-black/30"
         className="block max-h-[calc(100svh-8rem)] w-[calc(100%-2rem)] max-w-[447px] overflow-y-auto rounded-2xl border-[#357A5B] bg-white p-[30px] sm:max-w-[447px]"
-        onEscapeKeyDown={(event) => { if (isPending) event.preventDefault() }}
+        onEscapeKeyDown={(event) => {
+          if (isPending) event.preventDefault()
+        }}
         onInteractOutside={(event) => event.preventDefault()}
       >
         <DialogClose
@@ -98,8 +107,15 @@ export default function UsageSurveyPopup() {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6" aria-busy={isPending}>
-          <fieldset disabled={isPending} className="space-y-3 disabled:opacity-60">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+          aria-busy={isPending}
+        >
+          <fieldset
+            disabled={isPending}
+            className="space-y-3 disabled:opacity-60"
+          >
             <legend className="sr-only">מטרת השימוש באתר (לא חובה)</legend>
             {interests.map((interest) => (
               <label
@@ -116,18 +132,29 @@ export default function UsageSurveyPopup() {
                   onChange={() => setSelectedReason(interest.reason)}
                   className="size-5 shrink-0 accent-[#1E8025]"
                 />
-                <span className="text-base font-medium text-[#59687D]">{interest.label}</span>
+                <span className="text-base font-medium text-[#59687D]">
+                  {interest.label}
+                </span>
               </label>
             ))}
           </fieldset>
 
           <p className="text-sm text-gray-600">
             המענה לסקר אינו חובה. למידע על השימוש בנתונים, ראו את{' '}
-            <Link to="/terms" className="underline" onClick={() => setIsOpen(false)}>
+            <Link
+              to="/terms"
+              className="underline"
+              onClick={() => setIsOpen(false)}
+            >
               מדיניות הפרטיות
-            </Link>.
+            </Link>
+            .
           </p>
-          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+          {error && (
+            <p role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+          )}
           <Button
             type="submit"
             disabled={isPending}
@@ -138,7 +165,9 @@ export default function UsageSurveyPopup() {
                 <Loader2 className="size-6 animate-spin" aria-hidden="true" />
                 <span role="status">שולח…</span>
               </>
-            ) : 'המשך גלישה באתר'}
+            ) : (
+              'המשך גלישה באתר'
+            )}
           </Button>
         </form>
       </DialogContent>

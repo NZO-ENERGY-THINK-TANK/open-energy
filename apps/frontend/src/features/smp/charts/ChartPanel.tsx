@@ -11,7 +11,10 @@ type ChartPanelProps = {
 }
 
 export default function ChartPanel({
-  option, title, description, empty,
+  option,
+  title,
+  description,
+  empty,
   emptyMessage = 'אין נתונים להצגה בטווח שנבחר',
 }: ChartPanelProps) {
   const id = useId()
@@ -19,22 +22,40 @@ export default function ChartPanel({
   const chart = useRef<ReactECharts>(null)
 
   useEffect(() => {
-    if (empty || !container.current || typeof ResizeObserver === 'undefined') return
-    const observer = new ResizeObserver(() => chart.current?.getEchartsInstance().resize())
+    if (empty || !container.current || typeof ResizeObserver === 'undefined')
+      return
+    const observer = new ResizeObserver(() =>
+      chart.current?.getEchartsInstance().resize(),
+    )
     observer.observe(container.current)
     return () => observer.disconnect()
   }, [empty])
 
   return (
     <figure dir="rtl" className="w-full min-w-0" aria-label={title}>
-      <p id={`${id}-description`} className="sr-only">{description}</p>
-      <div ref={container} className="h-[300px] w-full min-w-0 md:h-[500px]" dir="ltr">
+      <p id={`${id}-description`} className="sr-only">
+        {description}
+      </p>
+      <div
+        ref={container}
+        className="h-[300px] w-full min-w-0 md:h-[500px]"
+        dir="ltr"
+      >
         {empty ? (
-          <div role="status" dir="rtl" className="flex h-full items-center justify-center text-muted-foreground">
+          <div
+            role="status"
+            dir="rtl"
+            className="flex h-full items-center justify-center text-muted-foreground"
+          >
             {emptyMessage}
           </div>
         ) : (
-          <div role="img" aria-label={title} aria-describedby={`${id}-description`} className="h-full w-full">
+          <div
+            role="img"
+            aria-label={title}
+            aria-describedby={`${id}-description`}
+            className="h-full w-full"
+          >
             <ReactECharts
               ref={chart}
               option={option}
