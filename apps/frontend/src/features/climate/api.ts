@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { climateRangeSchema, climateResponseSchema, climateViewSchema } from './types'
 import type { ClimateRange, ClimateView } from './types'
+import { apiFetch } from '@/lib/api'
 
-const BASE = '/api/backend/api/v1/heat-load-vs-generation'
+const BASE = '/api/v1/heat-load-vs-generation'
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 export function getClimateView(range: ClimateRange): ClimateView {
@@ -27,7 +28,7 @@ export function useHeatLoadGeneration(range: ClimateRange, view: ClimateView) {
   return useQuery({
     queryKey: ['climate', 'heat-load-vs-generation', range, view],
     queryFn: async ({ signal }) => {
-      const response = await requireSuccess(await fetch(`${BASE}/?${filterParams(range, view)}`, { signal, headers: { Accept: 'application/json' } }))
+      const response = await requireSuccess(await apiFetch(`${BASE}/?${filterParams(range, view)}`, { signal, headers: { Accept: 'application/json' } }))
       return climateResponseSchema.parse(await response.json())
     },
     staleTime: 5 * 60 * 1000,
@@ -48,7 +49,7 @@ function exportFilename(disposition: string | null, fallback: string) {
 }
 
 export async function exportHeatLoadGeneration(range: ClimateRange, view: ClimateView) {
-  const response = await requireSuccess(await fetch(`${BASE}/export?${filterParams(range, view)}`, {
+  const response = await requireSuccess(await apiFetch(`${BASE}/export?${filterParams(range, view)}`, {
     signal: AbortSignal.timeout(120_000), headers: { Accept: EXCEL_TYPE },
   }))
   const blob = await response.blob()

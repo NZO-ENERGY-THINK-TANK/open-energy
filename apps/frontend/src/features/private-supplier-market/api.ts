@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
+import { apiFetch } from '@/lib/api'
 import type {
   ConnectedConsumersResponse,
   CustomerType,
   SwitchingRequestsResponse,
 } from './types'
 
-const API_BASE = '/api/backend/api/v1'
+const API_BASE = '/api/v1'
 const STALE_TIME = 5 * 60 * 1000
 const REFETCH_INTERVAL = 15 * 60 * 1000
 
@@ -41,7 +42,7 @@ async function requireSuccess(response: Response): Promise<Response> {
 }
 
 async function fetchJson<T>(url: string, signal: AbortSignal): Promise<T> {
-  const response = await requireSuccess(await fetch(url, { signal, headers: { Accept: 'application/json' } }))
+  const response = await requireSuccess(await apiFetch(url, { signal, headers: { Accept: 'application/json' } }))
   return response.json() as Promise<T>
 }
 
@@ -96,7 +97,7 @@ function exportFilename(disposition: string | null, fallback: string): string {
 }
 
 async function downloadExcel(url: string, fallback: string): Promise<void> {
-  const response = await requireSuccess(await fetch(url, {
+  const response = await requireSuccess(await apiFetch(url, {
     signal: AbortSignal.timeout(120_000),
     headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
   }))

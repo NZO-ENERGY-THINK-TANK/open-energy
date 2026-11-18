@@ -1,9 +1,10 @@
+import { apiFetch } from '@/lib/api'
 import { contactSchema } from './types.ts'
 import type { ContactPayload } from './types.ts'
 
 export async function submitContact(payload: ContactPayload): Promise<void> {
   const body = JSON.stringify(contactSchema.parse(payload))
-  const response = await fetch('/api/submit-contact', {
+  const response = await apiFetch('/api/submit-contact', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'omit',

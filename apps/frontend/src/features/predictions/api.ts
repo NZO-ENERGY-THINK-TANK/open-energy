@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
+import { apiFetch } from '@/lib/api'
 import { internationalComparisonSchema, israelForecastSchema } from './types'
 import type { ComparisonFilters } from './types'
 
-const BASE = '/api/backend/api/v1/renewables'
+const BASE = '/api/v1/renewables'
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 const queryTiming = { staleTime: 5 * 60 * 1000, refetchInterval: 15 * 60 * 1000, placeholderData: () => undefined }
 
@@ -17,7 +18,7 @@ export function useIsraelForecast() {
   return useQuery({
     queryKey: ['predictions', 'israel-forecast'],
     queryFn: async ({ signal }) => {
-      const response = await requireSuccess(await fetch(`${BASE}/renewable-forecast-israel`, { signal, headers: { Accept: 'application/json' } }))
+      const response = await requireSuccess(await apiFetch(`${BASE}/renewable-forecast-israel`, { signal, headers: { Accept: 'application/json' } }))
       return israelForecastSchema.parse(await response.json())
     },
     ...queryTiming,
@@ -27,7 +28,7 @@ export function useInternationalComparison(filters: ComparisonFilters) {
   return useQuery({
     queryKey: ['predictions', 'international-comparison', filters],
     queryFn: async ({ signal }) => {
-      const response = await requireSuccess(await fetch(`${BASE}/international-renewable-comparison?${comparisonParams(filters)}`, { signal, headers: { Accept: 'application/json' } }))
+      const response = await requireSuccess(await apiFetch(`${BASE}/international-renewable-comparison?${comparisonParams(filters)}`, { signal, headers: { Accept: 'application/json' } }))
       return internationalComparisonSchema.parse(await response.json())
     },
     ...queryTiming,
@@ -45,7 +46,7 @@ function exportFilename(disposition: string | null, fallback: string) {
   return safe && safe.length <= 200 && /\.xlsx$/i.test(safe) ? safe : fallback
 }
 async function downloadWorkbook(url: string, fallback: string) {
-  const response = await requireSuccess(await fetch(url, { signal: AbortSignal.timeout(120_000), headers: { Accept: EXCEL_TYPE } }))
+  const response = await requireSuccess(await apiFetch(url, { signal: AbortSignal.timeout(120_000), headers: { Accept: EXCEL_TYPE } }))
   const blob = await response.blob()
   const signature = new Uint8Array(await blob.slice(0, 4).arrayBuffer())
   if (!response.headers.get('Content-Type')?.toLowerCase().includes(EXCEL_TYPE) || signature[0] !== 0x50 || signature[1] !== 0x4b || signature[2] !== 0x03 || signature[3] !== 0x04) throw new Error('The server did not return an Excel workbook.')

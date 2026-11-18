@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { apiFetch } from '@/lib/api'
 import type { CapacityGrowthResponse, CumulativeCapacityResponse, DateRange, FacilitySizeResponse, ProductionMixResponse, RenewableFilters, RenewableShareResponse, ResponsesByDistrictResponse, ResponsesByPeriodResponse, ResponsesBySizeResponse } from './types'
 
 type Responses = {
@@ -13,7 +14,7 @@ type Responses = {
 }
 type Resource = keyof Responses
 type Filters = RenewableFilters | DateRange
-const BASE = '/api/backend/api/v1/renewables'
+const BASE = '/api/v1/renewables'
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 function resourceUrl(resource: Resource, filters: Filters, exporting = false) {
@@ -39,7 +40,7 @@ function useRenewableQuery<R extends Resource>(resource: R, filters: Filters, en
   return useQuery<Responses[R]>({
     queryKey: ['renewable-energy', resource, filters],
     queryFn: async ({ signal }) => {
-      const response = await requireSuccess(await fetch(resourceUrl(resource, filters), { signal, headers: { Accept: 'application/json' } }))
+      const response = await requireSuccess(await apiFetch(resourceUrl(resource, filters), { signal, headers: { Accept: 'application/json' } }))
       const data: unknown = await response.json()
       if (!data || typeof data !== 'object' || (resource === 'response-capacity/by-size'
         ? !('yearly_series' in data) || !Array.isArray(data.yearly_series)
@@ -79,7 +80,7 @@ export function exportFilename(disposition: string | null, fallback: string, suf
   return suffix && !filename.includes(suffix) ? filename.replace(/\.xlsx$/i, `-${suffix}.xlsx`) : filename
 }
 export async function exportRenewableData(resource: Resource, filters: Filters, suffix?: string): Promise<void> {
-  const response = await requireSuccess(await fetch(resourceUrl(resource, filters, true), { signal: AbortSignal.timeout(120_000), headers: { Accept: EXCEL_TYPE } }))
+  const response = await requireSuccess(await apiFetch(resourceUrl(resource, filters, true), { signal: AbortSignal.timeout(120_000), headers: { Accept: EXCEL_TYPE } }))
   const blob = await response.blob()
   const signature = new Uint8Array(await blob.slice(0, 4).arrayBuffer())
   if (signature[0] !== 0x50 || signature[1] !== 0x4b || signature[2] !== 0x03 || signature[3] !== 0x04) throw new Error('The server did not return an Excel workbook.')

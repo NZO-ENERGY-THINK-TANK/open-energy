@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
+import { apiFetch } from '@/lib/api'
 import type { DateRange, ProductionVsMarginalPriceResponse, SMPResponse } from './types'
 
-const API_BASE = '/api/backend/api/v1/energy'
+const API_BASE = '/api/v1/energy'
 const STALE_TIME = 5 * 60 * 1000
 const REFETCH_INTERVAL = 15 * 60 * 1000
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -29,7 +30,7 @@ async function requireSuccess(response: Response): Promise<Response> {
 }
 
 async function fetchJson<T>(url: string, signal: AbortSignal): Promise<T> {
-  const response = await requireSuccess(await fetch(url, {
+  const response = await requireSuccess(await apiFetch(url, {
     signal,
     headers: { Accept: 'application/json' },
   }))
@@ -89,7 +90,7 @@ function exportFilename(disposition: string | null, fallback: string): string {
 }
 
 async function downloadExcel(resource: Resource, range: DateRange): Promise<void> {
-  const response = await requireSuccess(await fetch(resourceUrl(resource, range, true), {
+  const response = await requireSuccess(await apiFetch(resourceUrl(resource, range, true), {
     signal: AbortSignal.timeout(120_000),
     headers: { Accept: EXCEL_TYPE },
   }))
