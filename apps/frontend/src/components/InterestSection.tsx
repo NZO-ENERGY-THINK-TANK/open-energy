@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import interestSectionBackground from '@/assets/backgrounds/interest-section.png'
 import { Button } from '@/components/ui/button'
 
 const articles = [
@@ -27,7 +28,7 @@ export default function InterestSection() {
     <section aria-labelledby={headingId} className="relative">
       <div className="pointer-events-none absolute right-0 bottom-0 flex size-[150px] items-end md:size-[250px]">
         <img
-          src="/legacy/images/Ellipse 891.png"
+          src={interestSectionBackground}
           width={250}
           height={250}
           className="w-full object-cover"

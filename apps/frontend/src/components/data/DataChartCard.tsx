@@ -2,6 +2,7 @@ import { useId, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Download, Info, Loader2 } from 'lucide-react'
+import apiIcon from '@/assets/icons/api.png'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
@@ -53,7 +54,7 @@ export default function DataChartCard({ title, apiHash, sourceNotes, onExport, e
         </div>
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="icon" className="text-[#59687D]">
-            <Link to="/api" hash={apiHash} aria-label={`תיעוד API: ${title}`}><img src="/legacy/images/API.png" width={32} height={32} alt="" /></Link>
+            <Link to="/api" hash={apiHash} aria-label={`תיעוד API: ${title}`}><img src={apiIcon} width={32} height={32} alt="" /></Link>
           </Button>
           <Button type="button" variant="ghost" size="icon" className="text-[#59687D]" disabled={exportDisabled || isExporting} onClick={() => void download()} aria-label={isExporting ? 'מוריד נתונים' : `הורדת Excel: ${title}`}>
             {isExporting ? <Loader2 size={20} className="animate-spin" aria-hidden="true" /> : <Download size={20} aria-hidden="true" />}

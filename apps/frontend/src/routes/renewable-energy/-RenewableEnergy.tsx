@@ -1,4 +1,5 @@
 import { lazy, Suspense, useId, useState } from 'react'
+import homeRenewableBackground from '@/assets/backgrounds/home-renewable.png'
 import InterestSection from '@/components/InterestSection'
 import RenewableEnergyHero from '@/features/renewable-energy/RenewableEnergyHero'
 import ProductionSection from '@/features/renewable-energy/ProductionSection'
@@ -13,7 +14,7 @@ export default function RenewableEnergy() {
 
   return (
     <div dir="rtl" className="relative">
-      <img src="/legacy/images/Ellipse 89.png" width={600} height={600} alt="" className="pointer-events-none absolute top-0 left-0 z-10 h-[200px] w-[300px] md:h-[500px] md:w-[800px]" />
+      <img src={homeRenewableBackground} width={600} height={600} alt="" className="pointer-events-none absolute top-0 left-0 z-10 h-[200px] w-[300px] md:h-[500px] md:w-[800px]" />
       <div className="container relative mx-auto w-full space-y-5 overflow-hidden px-5 py-5 md:space-y-[52px] md:py-[52px]">
         <RenewableEnergyHero id={id} topic={topic} onSelect={(next) => setTopic((current) => current === next ? 'production' : next)} />
         <section id={`${id}-panel`} aria-label="נתוני אנרגיה מתחדשת">

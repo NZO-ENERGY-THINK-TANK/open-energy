@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
+import pageGlow from '@/assets/backgrounds/page-glow.png'
 import InterestSection from '@/components/InterestSection'
 import EndpointCard from './EndpointCard'
 import { endpoints, type ApiEndpoint } from './endpoints'
@@ -51,7 +52,7 @@ export default function ApiPage() {
   return (
     <div dir="rtl" className="relative isolate min-w-0 text-[#484C56]">
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-        <img src="/legacy/images/Ellipse 89 (1).png" width={600} height={600} alt="" className="absolute top-0 left-0 size-[600px] max-w-none" />
+        <img src={pageGlow} width={600} height={600} alt="" className="absolute top-0 left-0 size-[600px] max-w-none" />
       </div>
       <div className="container relative mx-auto min-w-0 px-5 py-10 md:py-[52px]">
         <header className="px-5 md:px-[60px]">

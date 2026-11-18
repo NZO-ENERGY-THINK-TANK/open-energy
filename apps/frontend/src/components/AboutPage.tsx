@@ -1,8 +1,13 @@
+import pageGlow from '@/assets/backgrounds/page-glow.png'
+import nzoLogo from '@/assets/brand/nzo.png'
+import heschelLogo from '@/assets/brand/heschel.png'
+import aboutProject from '@/assets/heroes/about-project.png'
+
 export default function AboutPage() {
   return (
     <div dir="rtl" className="relative isolate overflow-hidden text-right text-[#484C56]">
       <img
-        src="/legacy/images/Ellipse 89 (1).png"
+        src={pageGlow}
         width={600}
         height={600}
         className="pointer-events-none absolute top-0 left-0 -z-10 size-[600px] max-w-none"
@@ -27,7 +32,7 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="flex w-full justify-end">
-                <img src="/legacy/images/nzo_logo.png" width={350} height={230} className="h-auto w-[350px] max-w-full rounded-full object-contain md:h-[230px]" alt="פרויקט NZO" loading="lazy" />
+                <img src={nzoLogo} width={350} height={230} className="h-auto w-[350px] max-w-full rounded-full object-contain md:h-[230px]" alt="פרויקט NZO" loading="lazy" />
               </div>
             </div>
           </section>
@@ -35,7 +40,7 @@ export default function AboutPage() {
           <section aria-labelledby="about-heschel" className="px-5 py-10 md:px-[60px] md:py-[50px]">
             <div className="flex flex-col items-center gap-5 md:flex-row md:gap-8">
               <div className="flex w-full justify-start">
-                <img src="/legacy/images/heshel_logo.png" width={350} height={230} className="h-auto w-[350px] max-w-full object-contain md:h-[230px]" alt="מרכז השל לקיימות" loading="lazy" />
+                <img src={heschelLogo} width={350} height={230} className="h-auto w-[350px] max-w-full object-contain md:h-[230px]" alt="מרכז השל לקיימות" loading="lazy" />
               </div>
               <div className="flex w-full flex-col gap-3 md:gap-5">
                 <h2 id="about-heschel" className="text-2xl font-extrabold text-[#276E4E] md:text-[34px]">
@@ -63,7 +68,7 @@ export default function AboutPage() {
                 </address>
               </div>
               <div className="flex w-full justify-end">
-                <img src="/legacy/images/Frame 427319914 (2).png" width={350} height={230} className="h-[150px] w-[350px] max-w-full rounded-full object-cover md:h-[230px]" alt="" loading="lazy" />
+                <img src={aboutProject} width={350} height={230} className="h-[150px] w-[350px] max-w-full rounded-full object-cover md:h-[230px]" alt="" loading="lazy" />
               </div>
             </div>
           </section>

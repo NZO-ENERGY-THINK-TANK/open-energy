@@ -1,10 +1,11 @@
+import pageGlow from '@/assets/backgrounds/page-glow.png'
 import ContactForm from './ContactForm'
 
 export default function ContactPage() {
   return (
     <div dir="rtl" className="relative isolate overflow-hidden">
       <img
-        src="/legacy/images/Ellipse 89 (1).png"
+        src={pageGlow}
         width={600}
         height={600}
         alt=""

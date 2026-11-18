@@ -4,6 +4,8 @@ import dayjs from 'dayjs'
 import { Info, Loader2 } from 'lucide-react'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import type { TooltipContentProps } from 'recharts'
+import apiIcon from '@/assets/icons/api.png'
+import downloadIcon from '@/assets/icons/download.png'
 import { Button } from '@/components/ui/button'
 import QueryContent from '@/components/data/QueryContent'
 import ClimateDateRangeFilter from '../ClimateDateRangeFilter'
@@ -133,10 +135,10 @@ export default function HeatLoadGenerationChart() {
         </div>
         <div className="flex shrink-0 items-center gap-3">
           <Button asChild variant="ghost" size="icon">
-            <Link to="/api" hash="heat-load-vs-generation" aria-label="תיעוד API: ייצור חשמל אל מול עומס החום"><img src="/legacy/images/API.png" alt="" width={32} height={32} /></Link>
+            <Link to="/api" hash="heat-load-vs-generation" aria-label="תיעוד API: ייצור חשמל אל מול עומס החום"><img src={apiIcon} alt="" width={32} height={32} /></Link>
           </Button>
           <Button type="button" variant="ghost" size="icon" disabled={isExporting} onClick={() => void download()} aria-label={isExporting ? 'מוריד נתונים' : 'הורדת Excel: ייצור חשמל אל מול עומס החום'}>
-            {isExporting ? <Loader2 className="animate-spin" aria-hidden="true" /> : <img src="/legacy/images/download_2.png" alt="" width={32} height={32} />}
+            {isExporting ? <Loader2 className="animate-spin" aria-hidden="true" /> : <img src={downloadIcon} alt="" width={32} height={32} />}
           </Button>
         </div>
       </header>

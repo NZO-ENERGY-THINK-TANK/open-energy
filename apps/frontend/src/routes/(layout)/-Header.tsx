@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { Menu, X } from 'lucide-react'
+import heschelHeaderLogo from '@/assets/brand/heschel-header-logo.png'
 import { Button } from '@/components/ui/button'
 import Logo from '@/routes/(layout)/-Logo'
 
@@ -83,7 +84,7 @@ export default function Header() {
               <Logo />
             </Link>
             <img
-              src="/legacy/hetchel.png"
+              src={heschelHeaderLogo}
               alt="מרכז השל לקיימות"
               width={47}
               height={40}

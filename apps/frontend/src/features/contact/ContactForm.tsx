@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import type { ChangeEvent, SubmitEvent } from 'react'
 import { X } from 'lucide-react'
+import contactSuccessIcon from '@/assets/icons/contact-success.png'
 import { Button } from '@/components/ui/button'
 import { submitContact } from './api'
 import { contactSchema } from './types'
@@ -93,7 +94,7 @@ export default function ContactForm() {
           >
             <X className="size-10" aria-hidden="true" />
           </button>
-          <img src="/legacy/images/mark.png" width={80} height={80} className="size-20" alt="" />
+          <img src={contactSuccessIcon} width={80} height={80} className="size-20" alt="" />
           <div role="status" className="flex w-full flex-col items-center gap-[10px]">
             <h3 ref={successHeading} tabIndex={-1} className="text-lg font-bold text-[#1E8025] focus-visible:outline-2 focus-visible:outline-offset-2 md:text-2xl">
               ההודעה נשלחה בהצלחה!

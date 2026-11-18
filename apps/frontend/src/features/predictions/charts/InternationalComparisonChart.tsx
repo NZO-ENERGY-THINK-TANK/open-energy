@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import apiIcon from '@/assets/icons/api.png'
+import downloadIcon from '@/assets/icons/download.png'
 import QueryContent from '@/components/data/QueryContent'
 import { exportInternationalComparison, useInternationalComparison } from '../api'
 import type { InternationalRegion } from '../types'
@@ -148,8 +150,8 @@ export default function InternationalComparisonChart() {
           </Popover>
         </div>
         <div className="flex shrink-0 items-center justify-end gap-3 md:justify-start">
-          <button type="button" onClick={() => void download()} disabled={exporting} aria-label={exporting ? 'מוריד נתונים' : `ייצוא לאקסל: ${title}`} className="rounded disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4"><img src="/legacy/images/download_2.png" width={28} height={28} alt="" /></button>
-          <Link to="/api" hash="renewables-delivery-4-international-renewable-comparison" aria-label={`תיעוד API: ${title}`} className="rounded focus-visible:outline-2 focus-visible:outline-offset-4"><img src="/legacy/images/API.png" width={28} height={28} alt="" /></Link>
+          <button type="button" onClick={() => void download()} disabled={exporting} aria-label={exporting ? 'מוריד נתונים' : `ייצוא לאקסל: ${title}`} className="rounded disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4"><img src={downloadIcon} width={28} height={28} alt="" /></button>
+          <Link to="/api" hash="renewables-delivery-4-international-renewable-comparison" aria-label={`תיעוד API: ${title}`} className="rounded focus-visible:outline-2 focus-visible:outline-offset-4"><img src={apiIcon} width={28} height={28} alt="" /></Link>
         </div>
       </header>
       <nav aria-label="מקרא השוואה בינלאומית" className="mb-6 flex flex-wrap items-center justify-start gap-6 text-right">

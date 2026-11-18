@@ -1,6 +1,8 @@
 import { useId, useState, type ReactNode } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ChevronDown, Info, Loader2 } from 'lucide-react'
+import apiIcon from '@/assets/icons/api.png'
+import downloadIcon from '@/assets/icons/download.png'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 export function ChartCard({ title, apiHash, onExport, notes, filters, children }: {
@@ -51,10 +53,10 @@ export function ChartCard({ title, apiHash, onExport, notes, filters, children }
         </div>
         <div className="flex shrink-0 items-start gap-2 md:gap-4">
           <Link to="/api" hash={apiHash} aria-label={`תיעוד API: ${title}`} className="rounded focus-visible:outline-2 focus-visible:outline-offset-2">
-            <img src="/legacy/images/API.png" width={32} height={32} alt="API" />
+            <img src={apiIcon} width={32} height={32} alt="API" />
           </Link>
           <button type="button" disabled={exporting} onClick={() => void download()} aria-label={`הורדת Excel: ${title}`} className="rounded focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50">
-            {exporting ? <Loader2 size={32} className="animate-spin" /> : <img src="/legacy/images/download_2.png" width={32} height={32} alt="" />}
+            {exporting ? <Loader2 size={32} className="animate-spin" /> : <img src={downloadIcon} width={32} height={32} alt="" />}
           </button>
         </div>
       </header>

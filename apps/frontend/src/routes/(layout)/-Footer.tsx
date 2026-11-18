@@ -1,4 +1,6 @@
 import { Link } from '@tanstack/react-router'
+import euCofundedLogo from '@/assets/brand/eu-cofunded.png'
+import omnisLogo from '@/assets/brand/omnis.png'
 
 export default function Footer() {
   return (
@@ -32,7 +34,7 @@ export default function Footer() {
           <div className="flex w-full max-w-[676px] flex-col items-start gap-3 text-right md:gap-5">
             <div className="flex w-full items-center justify-end gap-6">
               <img
-                src="/legacy/images/cofounded.png"
+                src={euCofundedLogo}
                 width={120}
                 height={26}
                 className="h-auto w-[120px] md:w-[250px]"
@@ -48,7 +50,7 @@ export default function Footer() {
             <div className="ml-0 flex w-full items-end justify-end gap-0 text-sm md:text-base">
               עיצוב ופיתוח ע״י
               <img
-                src="/legacy/images/omnis_logo1.png"
+                src={omnisLogo}
                 width={90}
                 height={30}
                 className="h-auto w-[75px] md:w-[90px]"

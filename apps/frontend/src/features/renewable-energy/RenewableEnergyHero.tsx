@@ -1,12 +1,18 @@
+import renewableStart from '@/assets/heroes/renewable-start.png'
+import renewableMiddle from '@/assets/heroes/renewable-middle.png'
+import renewableEnd from '@/assets/heroes/renewable-end.png'
+import renewableProductionIcon from '@/assets/icons/renewable-production.svg'
+import renewableFacilitiesIcon from '@/assets/icons/renewable-facilities.svg'
+import renewableRequestsIcon from '@/assets/icons/renewable-requests.svg'
 import { Button } from '@/components/ui/button'
 import type { RenewableEnergyTopic } from './types'
 
 const topics = [
-  { value: 'production', label: 'ייצור אנרגיות מתחדשות', icon: '/legacy/svg/Group.svg', width: 32, height: 32 },
-  { value: 'facilities', label: 'מתקני ייצור מחוברים', icon: '/legacy/images/smart-factory_18526182 1.svg', width: 27, height: 26 },
-  { value: 'requests', label: 'בקשות חיבור ותשובות', icon: '/legacy/images/Group.svg', width: 28, height: 28 },
+  { value: 'production', label: 'ייצור אנרגיות מתחדשות', icon: renewableProductionIcon, width: 32, height: 32 },
+  { value: 'facilities', label: 'מתקני ייצור מחוברים', icon: renewableFacilitiesIcon, width: 27, height: 26 },
+  { value: 'requests', label: 'בקשות חיבור ותשובות', icon: renewableRequestsIcon, width: 28, height: 28 },
 ] as const
-const images = ['Frame 427319914 (4).png', 'Frame 427319913.png', 'Frame 427319915.png']
+const images = [renewableStart, renewableMiddle, renewableEnd]
 
 export default function RenewableEnergyHero({ topic, onSelect, id }: {
   topic: RenewableEnergyTopic
@@ -34,7 +40,7 @@ export default function RenewableEnergyHero({ topic, onSelect, id }: {
         </div>
         {topic === 'production' && (
           <div aria-hidden="true" className="relative flex w-full justify-between gap-4 p-6 md:p-[30px] md:pr-0">
-            {images.map((image, index) => <div key={image} className="w-full"><img src={`/legacy/images/${image}`} width={192} height={308} alt="" className={`w-full md:h-[308px] md:w-[192px] ${index === 1 ? 'mt-20 md:mt-40' : ''}`} /></div>)}
+            {images.map((image, index) => <div key={image} className="w-full"><img src={image} width={192} height={308} alt="" className={`w-full md:h-[308px] md:w-[192px] ${index === 1 ? 'mt-20 md:mt-40' : ''}`} /></div>)}
           </div>
         )}
       </div>

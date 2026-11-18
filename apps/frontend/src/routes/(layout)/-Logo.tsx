@@ -1,7 +1,9 @@
+import openEnergyLogo from '@/assets/brand/open-energy-logo.png'
+
 export default function Logo() {
   return (
     <img
-      src="/legacy/Frame 427319881.png"
+      src={openEnergyLogo}
       alt="אנרגיה פתוחה — NZO"
       width={140}
       height={56}

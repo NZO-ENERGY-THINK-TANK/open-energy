@@ -3,6 +3,8 @@ import type { ReactNode } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Info, Loader2 } from 'lucide-react'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import apiIcon from '@/assets/icons/api.png'
+import downloadIcon from '@/assets/icons/download.png'
 
 export default function SMPChartCard({ title, apiHash, sourceNotes, onExport, exportDisabled, children }: {
   title: string
@@ -36,9 +38,9 @@ export default function SMPChartCard({ title, apiHash, sourceNotes, onExport, ex
           </Tooltip.Root></Tooltip.Provider>
         </div>
         <div className="flex shrink-0 items-start gap-2 md:gap-4">
-          <Link to="/api" hash={apiHash} aria-label={`תיעוד API: ${title}`} className="hover:opacity-80"><img src="/legacy/images/API.png" alt="API" className="size-8" /></Link>
+          <Link to="/api" hash={apiHash} aria-label={`תיעוד API: ${title}`} className="hover:opacity-80"><img src={apiIcon} alt="API" className="size-8" /></Link>
           <button type="button" disabled={exportDisabled || isExporting} onClick={() => void download()} aria-label={isExporting ? 'מוריד נתונים' : `הורדת Excel: ${title}`} className="cursor-pointer hover:opacity-80 disabled:opacity-50">
-            {isExporting ? <Loader2 className="size-8 animate-spin" /> : <img src="/legacy/images/download_2.png" alt="Download" className="size-8" />}
+            {isExporting ? <Loader2 className="size-8 animate-spin" /> : <img src={downloadIcon} alt="Download" className="size-8" />}
           </button>
         </div>
       </header>

@@ -1,5 +1,8 @@
 import { Link } from '@tanstack/react-router'
 import { CloudLightning, Leaf, Scale, SolarPanel } from 'lucide-react'
+import homeStart from '@/assets/heroes/home-start.jpg'
+import homeMiddle from '@/assets/heroes/home-middle.png'
+import homeEnd from '@/assets/heroes/home-end.png'
 import { Button } from '@/components/ui/button'
 
 const topicLinkClassName =
@@ -68,7 +71,7 @@ export default function HeroSection() {
         <div className="relative flex w-full justify-between gap-4 p-6 md:p-[30px] md:pr-0">
           <div className="w-full min-w-0">
             <img
-              src="/legacy/images/main_img.jpg"
+              src={homeStart}
               width={192}
               height={308}
               className="w-full rounded-full md:h-[308px] md:w-[192px]"
@@ -77,7 +80,7 @@ export default function HeroSection() {
           </div>
           <div className="w-full min-w-0">
             <img
-              src="/legacy/Frame 427319913.png"
+              src={homeMiddle}
               width={192}
               height={308}
               className="mt-20 w-full md:mt-40 md:h-[308px] md:w-[192px]"
@@ -86,7 +89,7 @@ export default function HeroSection() {
           </div>
           <div className="w-full min-w-0">
             <img
-              src="/legacy/Frame 427319915.png"
+              src={homeEnd}
               width={192}
               height={308}
               className="w-full md:h-[308px] md:w-[192px]"

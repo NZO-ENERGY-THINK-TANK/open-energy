@@ -8,7 +8,7 @@ React 19, TypeScript, Vite, Tailwind CSS 4, TanStack Router, and Radix-based sha
 - About page (`/about`): original organization information and contact details.
 - Shared responsive header/footer, Hebrew RTL layout, Heebo typography, and a not-found view.
 
-The original application remains untouched in `old-nextjs`. Its public assets are copied under `public/legacy` to avoid overwriting scaffold assets.
+The original application remains untouched in `old-nextjs`. App-owned images live in `src/assets/{brand,heroes,backgrounds,icons}` and use explicit imports so Vite resolves and fingerprints their URLs. Keep `public` for files requiring fixed public URLs, such as `favicon.svg`; unused legacy design exports and archives are not deployed. Former `/legacy/` asset URLs are no longer provided; external consumers must update their URLs or arrange hosting redirects.
 
 Charts, search, dashboard routes, contact submission, and newsletter tracking are not connected yet. Deferred navigation is visibly disabled and labeled “בקרוב”. Data panels explicitly state that live data is unavailable. No backend credentials or simulated submissions are included.
 

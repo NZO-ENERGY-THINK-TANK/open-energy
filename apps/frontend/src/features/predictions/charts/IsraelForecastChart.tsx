@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import apiIcon from '@/assets/icons/api.png'
+import downloadIcon from '@/assets/icons/download.png'
 import QueryContent from '@/components/data/QueryContent'
 import { exportIsraelForecast, useIsraelForecast } from '../api'
 import type { IsraelForecastPoint } from '../types'
@@ -110,8 +112,8 @@ export default function IsraelForecastChart() {
           </Popover>
         </div>
         <div className="flex items-center gap-2 md:gap-4">
-          <Link to="/api" hash="renewables-delivery-4-renewable-forecast-israel" aria-label="תיעוד API: יעדים מול ייצור בפועל" className="rounded focus-visible:outline-2 focus-visible:outline-offset-4"><img src="/legacy/images/API.png" width={32} height={32} alt="" /></Link>
-          <button type="button" onClick={() => void download()} disabled={exporting} aria-label={exporting ? 'מוריד נתונים' : 'ייצוא לאקסל: יעדים מול ייצור בפועל'} className="rounded disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4"><img src="/legacy/images/download_2.png" width={32} height={32} alt="" /></button>
+          <Link to="/api" hash="renewables-delivery-4-renewable-forecast-israel" aria-label="תיעוד API: יעדים מול ייצור בפועל" className="rounded focus-visible:outline-2 focus-visible:outline-offset-4"><img src={apiIcon} width={32} height={32} alt="" /></Link>
+          <button type="button" onClick={() => void download()} disabled={exporting} aria-label={exporting ? 'מוריד נתונים' : 'ייצוא לאקסל: יעדים מול ייצור בפועל'} className="rounded disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4"><img src={downloadIcon} width={32} height={32} alt="" /></button>
         </div>
       </header>
       <nav aria-label="מקרא יעדים בישראל" className="mt-3 mb-4 flex flex-col gap-6 md:flex-row">
