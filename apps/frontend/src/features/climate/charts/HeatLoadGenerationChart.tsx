@@ -37,11 +37,7 @@ const SERIES = [
 type SeriesKey = (typeof SERIES)[number]['key']
 type Visibility = Record<SeriesKey, boolean>
 
-function ClimateTooltip({
-  active,
-  payload,
-  label,
-}: TooltipContentProps<number, string>) {
+function ClimateTooltip({ active, payload, label }: TooltipContentProps) {
   if (!active || !payload.length) return null
   return (
     <div

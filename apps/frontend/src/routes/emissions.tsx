@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import EmissionsPage from '@/legacy/app/emissions/page'
+import EmissionsPage from '@/features/emissions/EmissionsPage'
 
 export const Route = createFileRoute('/emissions')({
   component: EmissionsPage,

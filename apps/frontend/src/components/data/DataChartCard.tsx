@@ -16,6 +16,7 @@ type DataChartCardProps = {
   sourceNotes: ReactNode
   onExport: () => Promise<void>
   exportDisabled?: boolean
+  exportFormat?: 'Excel' | 'CSV'
   exportNote?: string
   children: ReactNode
 }
@@ -26,6 +27,7 @@ export default function DataChartCard({
   sourceNotes,
   onExport,
   exportDisabled,
+  exportFormat = 'Excel',
   exportNote,
   children,
 }: DataChartCardProps) {
@@ -101,7 +103,9 @@ export default function DataChartCard({
             className="text-[#59687D]"
             disabled={exportDisabled || isExporting}
             onClick={() => void download()}
-            aria-label={isExporting ? 'מוריד נתונים' : `הורדת Excel: ${title}`}
+            aria-label={
+              isExporting ? 'מוריד נתונים' : `הורדת ${exportFormat}: ${title}`
+            }
           >
             {isExporting ? (
               <Loader2 size={20} className="animate-spin" aria-hidden="true" />
