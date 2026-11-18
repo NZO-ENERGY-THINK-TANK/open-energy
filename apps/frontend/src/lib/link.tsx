@@ -3,7 +3,7 @@ import { Link as RouterLink } from '@tanstack/react-router'
 
 const routes = [
   '/', '/about', '/contact', '/api', '/api-docs', '/terms',
-  '/renewable-energy', '/predictions', '/climate', '/emissions', '/search/result',
+  '/renewable-energy', '/predictions', '/climate', '/emissions',
 ] as const
 
 type LinkProps = Omit<ComponentProps<'a'>, 'href'> & { href: string; replace?: boolean }

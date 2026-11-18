@@ -1,7 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import type { SubmitEvent } from 'react'
-import { Link, useLocation, useNavigate } from '@tanstack/react-router'
-import { Menu, Search, X } from 'lucide-react'
+import { Link, useLocation } from '@tanstack/react-router'
+import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Logo from '@/routes/(layout)/-Logo'
 
@@ -20,12 +19,12 @@ const topics = [
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [searchValue, setSearchValue] = useState('')
+
   const [isScrolled, setIsScrolled] = useState(false)
   const { pathname, hash } = useLocation()
-  const navigate = useNavigate()
+
   const menuId = useId()
-  const searchId = useId()
+
   const toggleRef = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLElement>(null)
   const showTopics = pathname !== '/' || isScrolled
@@ -67,13 +66,6 @@ export default function Header() {
     }
   }, [isMenuOpen])
 
-  const submitSearch = (event: SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const query = searchValue.trim()
-    if (!query) return
-    setIsMenuOpen(false)
-    void navigate({ to: '/search/result', search: { q: query } })
-  }
 
   const isTopicActive = (topic: (typeof topics)[number]) =>
     pathname === topic.to && (!topic.hash || hash === topic.hash)
@@ -117,22 +109,7 @@ export default function Header() {
               </nav>
 
               <div className="flex items-center gap-3 md:gap-4">
-                <form role="search" aria-label="חיפוש באתר" onSubmit={submitSearch}>
-                  <label htmlFor={searchId} className="sr-only">חיפוש באתר</label>
-                  <div className="flex w-[175px] items-center gap-2 rounded-full border border-white px-4 py-2 pl-3 transition-colors hover:border-gray-300 md:w-[200px]">
-                    <input
-                      id={searchId}
-                      type="search"
-                      placeholder="חיפוש"
-                      value={searchValue}
-                      onChange={(event) => setSearchValue(event.target.value)}
-                      className="w-full min-w-0 border-none bg-transparent text-sm text-white placeholder:text-white focus:outline-none"
-                    />
-                    <button type="submit" aria-label="חיפוש" className="flex shrink-0 items-center justify-center transition-transform hover:scale-110">
-                      <Search size={18} aria-hidden="true" className="text-[#DEDEDE]" />
-                    </button>
-                  </div>
-                </form>
+
                 <Button
                   ref={toggleRef}
                   type="button"
