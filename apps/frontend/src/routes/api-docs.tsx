@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import ApiDocsPage from '@/legacy/app/api-docs/page'
+import ApiPage from '@/features/api/ApiPage'
 
 export const Route = createFileRoute('/api-docs')({
-  component: ApiDocsPage,
+  component: ApiPage,
   head: () => ({ meta: [{ title: 'תיעוד API - NZO' }] }),
 })

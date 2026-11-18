@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import ApiPage from '@/legacy/app/api/page'
+import ApiPage from '@/features/api/ApiPage'
 
 export const Route = createFileRoute('/api')({
   component: ApiPage,
