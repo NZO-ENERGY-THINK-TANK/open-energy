@@ -213,6 +213,21 @@ PROXY_URL
 IMS_TOKEN
 ```
 
+### Browser CORS origins
+
+Set `CORS_ORIGINS` to a comma-separated allowlist of frontend origins:
+
+```env
+CORS_ORIGINS=https://data.nzo.org.il,https://open-energy-fe.vercel.app
+```
+
+Use exact origins (scheme, hostname and optional port), without paths or trailing
+slashes. Do not use `*` with credentialed requests. Surrounding whitespace and
+empty entries are ignored. This setting replaces the default allowlist; include
+localhost origins explicitly when needed for development. If unset, the existing
+allowlist is preserved; an empty value allows no cross-origin browser access.
+Restart the backend after changing this setting.
+
 **Using with Docker:**
 
 ```powershell

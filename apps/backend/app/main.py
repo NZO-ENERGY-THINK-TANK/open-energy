@@ -69,7 +69,7 @@ async def internal_api_key_guard(request, call_next):
 
     # Accept header or query param; default to expected to avoid accidental 401s in internal calls.
     provided = request.headers.get("X-Api-Key")
-    
+
     if not provided or provided != expected:
         return JSONResponse(
             status_code=401,
@@ -79,10 +79,9 @@ async def internal_api_key_guard(request, call_next):
 
 
 origins = [
-    "https://open-energy-fe.vercel.app",
-    "http://localhost:3000",
-    "https://open-energy-be-vo4yi.ondigitalocean.app",
-    "https://localhost:8000",
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "").split(",")
+    if origin.strip()
 ]
 
 app.add_middleware(
