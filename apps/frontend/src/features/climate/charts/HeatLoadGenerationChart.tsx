@@ -270,7 +270,7 @@ export default function HeatLoadGenerationChart() {
         <div className="flex shrink-0 items-center gap-3">
           <Button asChild variant="ghost" size="icon">
             <Link
-              to="/api"
+              to="/api-docs"
               hash="heat-load-vs-generation"
               aria-label="תיעוד API: ייצור חשמל אל מול עומס החום"
             >

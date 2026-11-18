@@ -80,7 +80,7 @@ export function ChartCard({
         </div>
         <div className="flex shrink-0 items-start gap-2 md:gap-4">
           <Link
-            to="/api"
+            to="/api-docs"
             hash={apiHash}
             aria-label={`תיעוד API: ${title}`}
             className="rounded focus-visible:outline-2 focus-visible:outline-offset-2"

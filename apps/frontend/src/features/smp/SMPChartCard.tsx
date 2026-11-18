@@ -77,7 +77,7 @@ export default function SMPChartCard({
         </div>
         <div className="flex shrink-0 items-start gap-2 md:gap-4">
           <Link
-            to="/api"
+            to="/api-docs"
             hash={apiHash}
             aria-label={`תיעוד API: ${title}`}
             className="hover:opacity-80"

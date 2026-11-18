@@ -428,7 +428,7 @@ export default function InternationalComparisonChart() {
             <img src={downloadIcon} width={28} height={28} alt="" />
           </button>
           <Link
-            to="/api"
+            to="/api-docs"
             hash="renewables-delivery-4-international-renewable-comparison"
             aria-label={`תיעוד API: ${title}`}
             className="rounded focus-visible:outline-2 focus-visible:outline-offset-4"

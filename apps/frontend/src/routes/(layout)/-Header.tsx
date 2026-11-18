@@ -8,7 +8,7 @@ import Logo from '@/routes/(layout)/-Logo'
 const navItems = [
   { to: '/about', label: 'אודותינו' },
   { to: '/contact', label: 'צור קשר' },
-  { to: '/api', label: 'API' },
+  { to: '/api-docs', label: 'API' },
 ] as const
 
 const topics = [

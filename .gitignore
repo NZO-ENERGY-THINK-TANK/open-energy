@@ -11,12 +11,6 @@ venv/
 .vscode/
 .venv
 .idea/
-/data_files/*
-
-# it seems like there is no auto download for these:
-!/data_files/diagram_sheet_1.csv
-!/data_files/diagram_sheet_2.csv
-!/data_files/Delivery_4_Diagram_2_International.csv
 
 node_modules
 

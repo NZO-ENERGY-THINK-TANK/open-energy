@@ -261,7 +261,7 @@ export default function IsraelForecastChart() {
         </div>
         <div className="flex items-center gap-2 md:gap-4">
           <Link
-            to="/api"
+            to="/api-docs"
             hash="renewables-delivery-4-renewable-forecast-israel"
             aria-label="תיעוד API: יעדים מול ייצור בפועל"
             className="rounded focus-visible:outline-2 focus-visible:outline-offset-4"

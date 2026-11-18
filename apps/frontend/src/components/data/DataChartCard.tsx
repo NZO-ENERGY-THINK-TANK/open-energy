@@ -92,7 +92,11 @@ export default function DataChartCard({
             size="icon"
             className="text-[#59687D]"
           >
-            <Link to="/api" hash={apiHash} aria-label={`תיעוד API: ${title}`}>
+            <Link
+              to="/api-docs"
+              hash={apiHash}
+              aria-label={`תיעוד API: ${title}`}
+            >
               <img src={apiIcon} width={32} height={32} alt="" />
             </Link>
           </Button>
