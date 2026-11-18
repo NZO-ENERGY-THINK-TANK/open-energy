@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import TermsPage from '@/legacy/app/terms/page'
+import TermsPage from '@/features/terms/TermsPage'
 
 export const Route = createFileRoute('/terms')({
   component: TermsPage,
