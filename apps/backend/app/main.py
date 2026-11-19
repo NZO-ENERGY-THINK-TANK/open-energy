@@ -46,16 +46,21 @@ app = FastAPI(title="Electricity Production Mix API")
 _notifier_task: asyncio.Task | None = None
 
 
+@app.get("/health", include_in_schema=False)
+async def health():
+    return {"status": "ok"}
+
+
 @app.middleware("http")
 async def internal_api_key_guard(request, call_next):
     """
-    Enforce INTERNAL_API_KEY except public docs and exact website form POSTs.
+    Enforce INTERNAL_API_KEY except health, public docs and exact website form POSTs.
     """
     # Allow public docs and OpenAPI schema.
     if request.method == "OPTIONS":
         return await call_next(request)
     path = request.url.path
-    if path.startswith(("/docs", "/openapi.json", "/redoc")):
+    if path == "/health" or path.startswith(("/docs", "/openapi.json", "/redoc")):
         return await call_next(request)
     if request.method == "POST" and path in site.PUBLIC_FORM_PATHS:
         return await call_next(request)
