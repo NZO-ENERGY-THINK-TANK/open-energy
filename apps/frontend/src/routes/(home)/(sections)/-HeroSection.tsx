@@ -1,8 +1,12 @@
 import { Link } from '@tanstack/react-router'
-import { CloudLightning, Leaf, Scale, SolarPanel } from 'lucide-react'
+import electricitySectorIcon from '@/assets/icons/home-electricity-sector.svg'
+import renewableEnergyIcon from '@/assets/icons/home-renewable-energy.svg'
+import climateIcon from '@/assets/icons/home-climate.svg'
+import predictionsIcon from '@/assets/icons/home-predictions.svg'
 import homeStart from '@/assets/heroes/home-start.jpg'
 import homeMiddle from '@/assets/heroes/home-middle.png'
 import homeEnd from '@/assets/heroes/home-end.png'
+
 import { Button } from '@/components/ui/button'
 
 const topicLinkClassName =
@@ -40,10 +44,12 @@ export default function HeroSection() {
               {/* TODO: Add the electricity-sector target when migrating the main content. */}
               <Button asChild variant="outline" className={topicLinkClassName}>
                 <a href="#electricity-sector">
-                  <Leaf
-                    size={32}
-                    aria-hidden="true"
-                    className="shrink-0 text-[#59687D]"
+                  <img
+                    src={electricitySectorIcon}
+                    width={32}
+                    height={32}
+                    alt=""
+                    className="shrink-0"
                   />
                   <span className="font-medium">משק החשמל</span>
                 </a>
@@ -51,10 +57,12 @@ export default function HeroSection() {
 
               <Button asChild variant="outline" className={topicLinkClassName}>
                 <Link to="/renewable-energy">
-                  <SolarPanel
-                    size={32}
-                    aria-hidden="true"
-                    className="shrink-0 text-[#59687D]"
+                  <img
+                    src={renewableEnergyIcon}
+                    width={32}
+                    height={32}
+                    alt=""
+                    className="shrink-0"
                   />
                   <span className="font-medium">אנרגיות מתחדשות</span>
                 </Link>
@@ -64,10 +72,12 @@ export default function HeroSection() {
 
               <Button asChild variant="outline" className={topicLinkClassName}>
                 <Link to="/climate">
-                  <CloudLightning
-                    size={32}
-                    aria-hidden="true"
-                    className="shrink-0 text-[#59687D]"
+                  <img
+                    src={climateIcon}
+                    width={32}
+                    height={32}
+                    alt=""
+                    className="shrink-0"
                   />
                   <span className="font-medium">אקלים</span>
                 </Link>
@@ -75,10 +85,12 @@ export default function HeroSection() {
 
               <Button asChild variant="outline" className={topicLinkClassName}>
                 <Link to="/predictions">
-                  <Scale
-                    size={32}
-                    aria-hidden="true"
-                    className="shrink-0 text-[#59687D]"
+                  <img
+                    src={predictionsIcon}
+                    width={33}
+                    height={33}
+                    alt=""
+                    className="shrink-0"
                   />
                   <span className="font-medium">תחזיות והשוואות</span>
                 </Link>
