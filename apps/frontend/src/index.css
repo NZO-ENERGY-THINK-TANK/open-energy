@@ -1,0 +1,265 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'Heebo', Arial, sans-serif;
+  --font-heebo: 'Heebo', Arial, sans-serif;
+  --color-chart-1: var(--chart-green);
+  --color-chart-2: var(--chart-yellow);
+  --color-chart-3: var(--chart-olive);
+  --color-chart-4: var(--chart-brown);
+  --color-chart-5: var(--chart-blue);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-green: var(--brand-green);
+  --color-brand-olive: var(--brand-olive);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-brown: var(--brand-brown);
+  --color-renewable: var(--energy-renewable);
+  --color-solar: var(--energy-photovoltaic);
+  --color-wind: var(--energy-wind);
+  --color-gas: var(--energy-natural-gas);
+  --color-coal: var(--energy-coal);
+  --color-energy-other-primary: var(--energy-other-primary);
+  --color-energy-renewable: var(--energy-renewable);
+  --color-energy-fossil: var(--energy-fossil);
+  --color-energy-co2-emissions: var(--energy-co2-emissions);
+  --color-energy-pumped-storage: var(--energy-pumped-storage);
+  --color-energy-other: var(--energy-other);
+  --color-energy-photovoltaic: var(--energy-photovoltaic);
+  --color-energy-biogas: var(--energy-biogas);
+  --color-energy-wind: var(--energy-wind);
+  --color-energy-solar-thermal: var(--energy-solar-thermal);
+  --color-energy-pv-storage: var(--energy-pv-storage);
+  --color-energy-coal: var(--energy-coal);
+  --color-energy-diesel: var(--energy-diesel);
+  --color-energy-natural-gas: var(--energy-natural-gas);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: #fff;
+  --color-secondary: #eef2e8;
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: #eef2e8;
+  --color-accent-foreground: var(--brand-dark);
+  --color-destructive: #b42318;
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--brand-green);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+:root {
+  --color-bg: #fffdf7;
+  --color-text: #1f2a24;
+  --brand-dark: #243428;
+  --brand-green: #5daa4b;
+  --brand-olive: #9cb46a;
+  --brand-yellow: #e2c14b;
+  --brand-brown: #7b5a46;
+  --chart-green: #4bae4f;
+  --chart-yellow: #d6b83a;
+  --chart-olive: #8faf52;
+  --chart-brown: #8a6b55;
+  --chart-blue: #4a7bd0;
+
+  /* Energy source colors: main categories and sub-categories. */
+  --energy-other-primary: #1665b3;
+  --energy-renewable: #2f7a4f;
+  --energy-fossil: #cea073;
+  --energy-co2-emissions: #5d6fff;
+  --energy-pumped-storage: #a4dbe4;
+  --energy-other: #a4dbe4;
+  --energy-photovoltaic: #c4c95c;
+  --energy-biogas: #8a9a2c;
+  --energy-wind: #60a261;
+  --energy-solar-thermal: #60a261;
+  --energy-pv-storage: #357a5b;
+  --energy-coal: #6b707c;
+  --energy-diesel: #1c1a17;
+  --energy-natural-gas: #957669;
+
+  --background: var(--color-bg);
+  --foreground: var(--color-text);
+  --card: #ffffff;
+  --primary: var(--brand-green);
+  --border: #e9e6da;
+  --muted: #eef2e8;
+  --muted-foreground: #6b7a69;
+  --radius: 0.75rem;
+  --container: 1160px;
+  font-family: 'Heebo', Arial, sans-serif;
+  color: var(--foreground);
+  background: var(--background);
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    margin: 0;
+    min-width: 320px;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-heebo);
+    text-align: right;
+  }
+  [id] {
+    scroll-margin-top: 10rem;
+  }
+  button:not(:disabled),
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--brand-dark);
+    outline-offset: 4px;
+  }
+  input[type='email'],
+  input[type='url'],
+  input[type='tel'],
+  code,
+  pre {
+    direction: ltr;
+    text-align: left;
+  }
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.market-container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-soft);
+}
+
+.metric-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.filter-chip {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.filter-chip:hover,
+.filter-chip.active {
+  background: var(--brand-green);
+  color: white;
+  border-color: var(--brand-green);
+}
+
+.export-button {
+  background: var(--brand-green);
+  color: white;
+  border: none;
+  border-radius: 1.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.export-button:hover {
+  background: var(--brand-dark);
+}
+.chart-container {
+  width: 100%;
+  height: 24rem;
+}
+.chart-container-small {
+  width: 100%;
+  height: 16rem;
+}
+.nav-active {
+  background: var(--brand-green);
+  color: white;
+}
+.recharts-yAxis .recharts-cartesian-axis-tick text {
+  text-anchor: start;
+}
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #fff;
+}
+::-webkit-scrollbar-thumb {
+  background: #c3c3c3;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-green);
+}
+.skip-link {
+  position: fixed;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: white;
+  color: var(--brand-dark);
+  border-radius: 0.5rem;
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

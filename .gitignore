@@ -8,9 +8,10 @@ __pycache__/
 *.xlsx
 venv/
 .env
-.env.*
 .vscode/
+.venv
 .idea/
-energy_mix_today_20251128203232.xlsx
-Files_Netunei_hashmal_mp_niyud (3).csv
-Files_Netunei_hashmal_mp_tzarchan (4).csv
+
+node_modules
+
+ignore

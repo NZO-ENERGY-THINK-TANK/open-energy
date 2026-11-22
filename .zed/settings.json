@@ -1,0 +1,147 @@
+{
+  "language_servers": ["...", "!biome"],
+  "lsp": {
+    "eslint": {
+      "settings": {
+        "workingDirectory": { "mode": "auto" },
+        "nodePath": "apps/frontend/node_modules"
+      }
+    },
+    "vtsls": {
+      "settings": {
+        "typescript": { "tsdk": "apps/frontend/node_modules/typescript/lib" },
+        "vtsls": { "autoUseWorkspaceTsdk": true }
+      }
+    },
+    "tailwindcss-language-server": {
+      "settings": {
+        "tailwindCSS": {
+          "experimental": { "configFile": "apps/frontend/src/index.css" },
+          "classFunctions": ["cn", "clsx", "cva"]
+        }
+      }
+    }
+  },
+  "languages": {
+    "JavaScript": {
+      "language_servers": [
+        "vtsls",
+        "eslint",
+        "tailwindcss-language-server",
+        "!biome"
+      ],
+      "code_actions_on_format": { "source.fixAll.eslint": true },
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "pnpm",
+          "arguments": [
+            "--dir",
+            "apps/frontend",
+            "exec",
+            "prettier",
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      }
+    },
+    "TypeScript": {
+      "language_servers": [
+        "vtsls",
+        "eslint",
+        "tailwindcss-language-server",
+        "!biome"
+      ],
+      "code_actions_on_format": { "source.fixAll.eslint": true },
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "pnpm",
+          "arguments": [
+            "--dir",
+            "apps/frontend",
+            "exec",
+            "prettier",
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      }
+    },
+    "TSX": {
+      "language_servers": [
+        "vtsls",
+        "eslint",
+        "tailwindcss-language-server",
+        "!biome"
+      ],
+      "code_actions_on_format": { "source.fixAll.eslint": true },
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "pnpm",
+          "arguments": [
+            "--dir",
+            "apps/frontend",
+            "exec",
+            "prettier",
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      }
+    },
+    "JSON": {
+      "language_servers": ["...", "!biome"],
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "pnpm",
+          "arguments": [
+            "--dir",
+            "apps/frontend",
+            "exec",
+            "prettier",
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      }
+    },
+    "JSONC": {
+      "language_servers": ["...", "!biome"],
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "pnpm",
+          "arguments": [
+            "--dir",
+            "apps/frontend",
+            "exec",
+            "prettier",
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      }
+    },
+    "CSS": {
+      "language_servers": ["...", "!biome"],
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "pnpm",
+          "arguments": [
+            "--dir",
+            "apps/frontend",
+            "exec",
+            "prettier",
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      }
+    }
+  }
+}

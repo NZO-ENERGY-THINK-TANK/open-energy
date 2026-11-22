@@ -1,179 +1,174 @@
-# =============================================================================
-# Open Energy Backend - Build & Deploy Pipeline
-# =============================================================================
-# This workflow builds a Docker image, pushes to ECR, and deploys to EC2
-#
-# REQUIRED GITHUB SECRETS:
-# -------------------------
-# AWS_ACCESS_KEY_ID       - AWS IAM user access key with ECR push permissions
-# AWS_SECRET_ACCESS_KEY   - AWS IAM user secret key
-# AWS_REGION              - AWS region (e.g., il-central-1)
-# AWS_ACCOUNT_ID          - AWS account ID (e.g., 123456789012)
-# ECR_REPOSITORY          - ECR repository name (e.g., open-energy-dev)
-# EC2_HOST                - EC2 instance IP or hostname
-# EC2_SSH_PRIVATE_KEY     - SSH private key for EC2 access (contents of id_ed25519)
-# EC2_SSH_USER            - SSH user (typically: ubuntu)
-# =============================================================================
-
-name: Build & Deploy
+name: Deploy Backend to ECS
 
 on:
   push:
-    branches:
-      - main
-      - master
-  workflow_dispatch:  # Allows manual trigger from GitHub Actions UI
+    branches: [dev, main]
+    paths:
+      - 'apps/backend/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+    inputs:
+      build_only:
+        description: Build and push the image without deploying (service bootstrap)
+        type: boolean
+        default: false
 
+concurrency:
+  group: open-energy-ecs-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+# Repository variables: AWS_DEPLOY_ROLE_ARN, ECR_REPOSITORY_URI,
+# STAGING_ECS_SERVICE_ARN (dev), PRODUCTION_ECS_SERVICE_ARN (main).
 env:
-  DOCKER_BUILDKIT: 1
+  AWS_REGION: il-central-1
+  AWS_PAGER: ''
+  IMAGE_REPOSITORY: ${{ vars.ECR_REPOSITORY_URI }}
+  AWS_DEPLOY_ROLE_ARN: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
 
 jobs:
-  build-and-deploy:
-    name: Build, Push & Deploy
+  deploy:
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+
     steps:
-      # -----------------------------------------------------------------------
-      # Checkout & Setup
-      # -----------------------------------------------------------------------
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Full history for versioning
-
-      - name: Generate version tag
-        id: version
+      - name: Validate configuration and select ECS service
+        env:
+          STAGING_ECS_SERVICE_ARN: ${{ vars.STAGING_ECS_SERVICE_ARN }}
+          PRODUCTION_ECS_SERVICE_ARN: ${{ vars.PRODUCTION_ECS_SERVICE_ARN }}
+          BUILD_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.build_only }}
         run: |
-          # Get the short commit SHA
-          SHORT_SHA=$(git rev-parse --short HEAD)
-          
-          # Get the current date
-          DATE=$(date +'%Y%m%d')
-          
-          # Count commits for incremental build number
-          BUILD_NUMBER=$(git rev-list --count HEAD)
-          
-          # Generate version: v{build_number}-{date}-{sha}
-          VERSION="v${BUILD_NUMBER}-${DATE}-${SHORT_SHA}"
-          
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "short_sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
-          echo "build_number=${BUILD_NUMBER}" >> $GITHUB_OUTPUT
-          
-          echo "=========================================="
-          echo "Generated Version: ${VERSION}"
-          echo "Build Number: ${BUILD_NUMBER}"
-          echo "Short SHA: ${SHORT_SHA}"
-          echo "=========================================="
+          set -euo pipefail
+          case "$GITHUB_REF" in
+            refs/heads/dev|refs/heads/main) ;;
+            *) echo '::error::Only dev and main branches may build or deploy.'; exit 1 ;;
+          esac
+          if [[ ! "$IMAGE_REPOSITORY" =~ ^([0-9]{12})\.dkr\.ecr\.il-central-1\.amazonaws\.com/[a-z0-9][a-z0-9._/-]*$ ]]; then
+            echo '::error::Set ECR_REPOSITORY_URI to an ECR repository URI in il-central-1 (without an image tag).'
+            exit 1
+          fi
+          account_id="${BASH_REMATCH[1]}"
+          if [[ ! "$AWS_DEPLOY_ROLE_ARN" =~ ^arn:aws:iam::${account_id}:role/.+$ ]]; then
+            echo '::error::Set AWS_DEPLOY_ROLE_ARN to a deployment role in the ECR account.'
+            exit 1
+          fi
+          if [[ "$BUILD_ONLY" == 'true' ]]; then
+            echo 'Manual build-only run: ECS deployment is disabled.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          case "$GITHUB_REF" in
+            refs/heads/dev)
+              service_arn="${STAGING_ECS_SERVICE_ARN:?Set repository variable STAGING_ECS_SERVICE_ARN}"
+              ;;
+            refs/heads/main)
+              service_arn="${PRODUCTION_ECS_SERVICE_ARN:?Set repository variable PRODUCTION_ECS_SERVICE_ARN}"
+              ;;
+          esac
+          if [[ -n "$STAGING_ECS_SERVICE_ARN" && "$STAGING_ECS_SERVICE_ARN" == "$PRODUCTION_ECS_SERVICE_ARN" ]]; then
+            echo '::error::Production must not use the staging service.'
+            exit 1
+          fi
+          if [[ ! "$service_arn" =~ ^arn:aws:ecs:il-central-1:${account_id}:service/[^/]+/[^/]+$ ]]; then
+            echo '::error::Selected ECS service ARN must belong to the ECR account in il-central-1.'
+            exit 1
+          fi
+          echo "ECS_SERVICE_ARN=$service_arn" >> "$GITHUB_ENV"
 
-      # -----------------------------------------------------------------------
-      # AWS & ECR Setup
-      # -----------------------------------------------------------------------
-      - name: Configure AWS credentials
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install AWS CLI
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.39.3.zip \
+            --output "$RUNNER_TEMP/awscliv2.zip"
+          unzip -q "$RUNNER_TEMP/awscliv2.zip" -d "$RUNNER_TEMP/aws-cli-install"
+          sudo "$RUNNER_TEMP/aws-cli-install/aws/install" --update
+          aws --version
+
+      - name: Authenticate to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: GitHubActions-${{ github.run_id }}
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
 
       - name: Login to Amazon ECR
-        id: ecr-login
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Set ECR repository URL
-        id: ecr
-        run: |
-          ECR_URL="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}"
-          echo "url=${ECR_URL}" >> $GITHUB_OUTPUT
-          echo "ECR URL: ${ECR_URL}"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # -----------------------------------------------------------------------
-      # Build & Push Docker Image
-      # -----------------------------------------------------------------------
-      - name: Build Docker image
-        run: |
-          echo "Building image: ${{ steps.ecr.outputs.url }}:${{ steps.version.outputs.version }}"
-          
-          docker build \
-            --build-arg BUILD_VERSION=${{ steps.version.outputs.version }} \
-            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg GIT_COMMIT=${{ github.sha }} \
-            --tag ${{ steps.ecr.outputs.url }}:${{ steps.version.outputs.version }} \
-            --tag ${{ steps.ecr.outputs.url }}:latest \
-            --tag ${{ steps.ecr.outputs.url }}:build-${{ steps.version.outputs.build_number }} \
-            .
+      - name: Build and push backend image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./apps/backend
+          file: ./apps/backend/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.IMAGE_REPOSITORY }}:${{ github.ref_name }}-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Push Docker image to ECR
+      - name: Record pushed image
+        env:
+          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
         run: |
-          echo "Pushing images to ECR..."
-          
-          # Push versioned tag
-          docker push ${{ steps.ecr.outputs.url }}:${{ steps.version.outputs.version }}
-          
-          # Push latest tag
-          docker push ${{ steps.ecr.outputs.url }}:latest
-          
-          # Push build number tag
-          docker push ${{ steps.ecr.outputs.url }}:build-${{ steps.version.outputs.build_number }}
-          
-          echo "=========================================="
-          echo "Pushed tags:"
-          echo "  - ${{ steps.version.outputs.version }}"
-          echo "  - latest"
-          echo "  - build-${{ steps.version.outputs.build_number }}"
-          echo "=========================================="
+          set -euo pipefail
+          if [[ ! "$IMAGE_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo '::error::Build did not return a valid image digest.'
+            exit 1
+          fi
+          echo "Image: $IMAGE_REPOSITORY@$IMAGE_DIGEST" >> "$GITHUB_STEP_SUMMARY"
 
-      # -----------------------------------------------------------------------
-      # Deploy to EC2
-      # -----------------------------------------------------------------------
-      - name: Setup SSH key
+      - name: Start ECS deployment by image digest
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.build_only) }}
+        env:
+          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          
-          # Add EC2 host to known_hosts to avoid prompt
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
-
-      - name: Deploy to EC2
-        run: |
-          echo "Deploying to EC2: ${{ secrets.EC2_HOST }}"
-          echo "Image tag: ${{ steps.version.outputs.version }}"
-          
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }} << 'DEPLOY_SCRIPT'
-          
-          echo "=========================================="
-          echo "Starting deployment on EC2"
-          echo "Timestamp: $(date)"
-          echo "=========================================="
-          
-          # Run deploy script with the new image tag
-          sudo OVERRIDE_IMAGE_TAG="${{ steps.version.outputs.version }}" /usr/local/bin/deploy.sh
-          
-          echo "=========================================="
-          echo "Deployment completed!"
-          echo "=========================================="
-          DEPLOY_SCRIPT
-
-      - name: Cleanup SSH key
-        if: always()
-        run: |
-          rm -f ~/.ssh/deploy_key
-
-      # -----------------------------------------------------------------------
-      # Summary
-      # -----------------------------------------------------------------------
-      - name: Deployment summary
-        run: |
-          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Version | \`${{ steps.version.outputs.version }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build Number | \`${{ steps.version.outputs.build_number }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Commit | \`${{ steps.version.outputs.short_sha }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| ECR Repository | \`${{ secrets.ECR_REPOSITORY }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Target Host | \`${{ secrets.EC2_HOST }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Trigger | \`${{ github.event_name }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          set -euo pipefail
+          if [[ ! "$IMAGE_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo '::error::Build did not return a valid image digest.'
+            exit 1
+          fi
+          service_file="$RUNNER_TEMP/ecs-service.json"
+          update_file="$RUNNER_TEMP/ecs-update.json"
+          trap 'rm -f "$service_file" "$update_file"' EXIT
+          umask 077
+          aws ecs describe-express-gateway-service \
+            --service-arn "$ECS_SERVICE_ARN" --output json > "$service_file"
+          # Refuse ambiguous configurations during an in-progress rollout.
+          jq -e --arg arn "$ECS_SERVICE_ARN" \
+            --arg image "$IMAGE_REPOSITORY@$IMAGE_DIGEST" '
+            .service
+            | if .serviceArn != $arn or .status.statusCode != "ACTIVE" then
+                error("Selected Express service is not active")
+              elif (.activeConfigurations | length) != 1 then
+                error("Expected exactly one active service configuration")
+              else
+                .activeConfigurations[0].primaryContainer
+                | if type != "object" or (.image | type) != "string" then
+                    error("Missing primary container configuration")
+                  else
+                    {serviceArn: $arn, primaryContainer: (. + {image: $image})}
+                  end
+              end
+          ' "$service_file" > "$update_file"
+          # Preserve environment, secrets, port and logs; change only the image.
+          # shortcut: rollout health is not checked here; add monitoring before relying on unattended releases.
+          aws ecs update-express-gateway-service \
+            --cli-input-json "file://$update_file" \
+            --query 'service.{ServiceArn:serviceArn,TargetRevision:targetConfiguration.serviceRevisionArn}' \
+            --output json
+          echo 'ECS accepted the deployment request. Rollout completion has not been verified.' >> "$GITHUB_STEP_SUMMARY"

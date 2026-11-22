@@ -1,0 +1,837 @@
+export type ApiEndpoint = {
+  id: string
+  title: string
+  description: string
+  method: 'GET'
+  path: string
+  parameters?: string[]
+  responseExample?: string
+}
+
+// Titles, order and hash IDs follow the legacy ApiSection; paths/contracts follow
+// app/main.py and app/api/v1 routers. Examples are illustrative excerpts, not live data.
+export const endpoints: ApiEndpoint[] = [
+  {
+    id: 'energy-overview',
+    title: 'מקורות ייצור חשמל',
+    description:
+      'Hierarchical breakdown of energy sources with percentages. Both dates must be supplied; otherwise the range defaults to the last 7 days.',
+    method: 'GET',
+    path: '/api/v1/energy/overview',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: `{
+  "start_date": "2025-01-06",
+  "end_date": "2026-01-06",
+  "filter": "year",
+  "categories": [...],
+  "category_percentages": { "renewables": 15.11, "non_renewables": 82.89, "other": 2.0 },
+  "total": 80561884.04,
+  "level1": {...},
+  "level2": {...},
+  "renewable_generation": 12173023.12,
+  "renewable_share_percent": 15.11
+}`,
+  },
+  {
+    id: 'energy-overview-details',
+    title: 'מקורות ייצור חשמל',
+    description:
+      'Detailed hierarchy of energy categories. Both dates must be supplied; otherwise the range defaults to the last 7 days.',
+    method: 'GET',
+    path: '/api/v1/energy/overview/details',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+  },
+  {
+    id: 'energy-overview-export',
+    title: 'ייצוא מקורות ייצור חשמל',
+    description:
+      'Export energy overview to Excel (XLSX). Both dates must be supplied; otherwise the range defaults to the last 7 days.',
+    method: 'GET',
+    path: '/api/v1/energy/overview/export',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: 'Streamed Excel file (energy_overview.xlsx)',
+  },
+  {
+    id: 'energy-production-mix',
+    title: 'תמהיל ייצור חשמל',
+    description:
+      'Aggregated electricity production mix and time series. Supply both dates or neither. Without both dates, day uses 1 day, month uses 7 days, and year uses 3650 days; month/year windows and initial view inference are backend-configurable. With no granularity, the view is inferred from the range (initial fallback: 7 days).',
+    method: 'GET',
+    path: '/api/v1/energy/production-mix',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+      'granularity (optional, day | month | year; default inferred; hourly | daily | monthly points respectively)',
+    ],
+    responseExample: `{
+  "start_date": "2025-01-06",
+  "end_date": "2026-01-06",
+  "filter": "year",
+  "level1": { "Non-renewables": 66781294.08, "Renewables": 12176723.06, "Other": 1608640.27 },
+  "level2": {...},
+  "total_generation": 80566657.41,
+  "renewable_share_percent": 15.11,
+  "series_granularity": "year",
+  "series": [...]
+}`,
+  },
+  {
+    id: 'energy-production-mix-export',
+    title: 'ייצוא תמהיל ייצור חשמל',
+    description:
+      'Export production mix to Excel (XLSX). Same date/view inference as production-mix: both dates are required to override the default window; day=1 day, month=7 days, year=3650 days (month/year backend-configurable).',
+    method: 'GET',
+    path: '/api/v1/energy/production-mix/export',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+      'granularity (optional, day | month | year; default inferred from range, initial fallback 7 days is backend-configurable)',
+    ],
+    responseExample: 'Streamed Excel file (production_mix.xlsx)',
+  },
+  {
+    id: 'energy-smp',
+    title: '(SMP) התפתחות מחיר השוק הסיטונאי',
+    description:
+      'System Marginal Price data with production correlation. Both dates must be supplied; otherwise defaults to the last 1 day. View is inferred; samples are included only for the day view.',
+    method: 'GET',
+    path: '/api/v1/energy/smp/',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: `{
+  "daily_average": [...],
+  "monthly_average": [...],
+  "chart_without_constraints": [...],
+  "chart_with_constraints": [...],
+  "correlation_view": [...],
+  "samples": [...],
+  "view": "day",
+  "start_date": "2026-01-05",
+  "end_date": "2026-01-06"
+}`,
+  },
+  {
+    id: 'energy-smp-export',
+    title: 'ייצוא (SMP) התפתחות מחיר השוק הסיטונאי',
+    description:
+      'Export SMP data to Excel (XLSX). Both dates must be supplied; otherwise defaults to the last 1 day.',
+    method: 'GET',
+    path: '/api/v1/energy/smp/export',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: 'Streamed Excel file (smp_STARTDATE_to_ENDDATE.xlsx)',
+  },
+  {
+    id: 'energy-smp-production-vs-marginal-price',
+    title: 'מחיר השוק הסיטונאי (SMP) מול הביקוש לחשמל',
+    description:
+      'Correlate electricity production with marginal pricing. Both dates must be supplied; otherwise defaults to the last 1 day.',
+    method: 'GET',
+    path: '/api/v1/energy/smp-production-vs-marginal-price/',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: `{
+  "start_date": "2026-01-05",
+  "end_date": "2026-01-06",
+  "view": "day",
+  "smp_series": [...],
+  "net_demand_series": [...],
+  "combined_series": [...],
+  "correlation": [...],
+  "correlation_by_view": {...},
+  "daily_average": [...],
+  "monthly_average": [...]
+}`,
+  },
+  {
+    id: 'energy-smp-production-vs-marginal-price-export',
+    title: 'ייצוא מחיר השוק הסיטונאי (SMP) מול הביקוש לחשמל',
+    description:
+      'Export SMP production vs marginal price to Excel (XLSX). Both dates must be supplied; otherwise defaults to the last 1 day.',
+    method: 'GET',
+    path: '/api/v1/energy/smp-production-vs-marginal-price/export',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample:
+      'Streamed Excel file (smp_production_vs_marginal_price_STARTDATE_to_ENDDATE.xlsx)',
+  },
+  {
+    id: 'private-supplier-connected-consumers',
+    title: 'צרכנים המחוברים למספקיי חשמל פרטיים',
+    description:
+      'Monthly consumers connected to private electricity suppliers. Dates are normalized to the first of the month; without both dates, uses the latest 12 months relative to the dataset, clipped to available data.',
+    method: 'GET',
+    path: '/api/v1/private-supplier-connected-consumers/',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: `{
+  "start_date": "2026-01-01",
+  "end_date": "2026-01-01",
+  "unit": "count",
+  "data": [{ "month": "2026-01", "total_consumers": 316929.0, "new_additions": 316929.0 }],
+  "segments": {...}
+}`,
+  },
+  {
+    id: 'private-supplier-export',
+    title: 'ייצוא צרכנים המחוברים למספקיי חשמל פרטיים',
+    description:
+      'Export private supplier consumers to Excel (XLSX). Dates are normalized to month starts; without both dates, uses the latest 12 dataset months, clipped to available data.',
+    method: 'GET',
+    path: '/api/v1/private-supplier-connected-consumers/export',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: 'Streamed Excel file (private_suppliers_consumers.xlsx)',
+  },
+  {
+    id: 'private-supplier-download-source',
+    title: 'צרכנים המחוברים למספקיי חשמל פרטיים',
+    description:
+      'Download the current master CSV file with all private supplier data.',
+    method: 'GET',
+    path: '/api/v1/private-supplier-connected-consumers/download-source',
+    responseExample:
+      'CSV file download (text/csv; filename follows the current source file)',
+  },
+  {
+    id: 'switching-requests',
+    title: 'סטטוס בקשות ניוד / בקשות ניוד - סיבות דחיה',
+    description:
+      'Consumer electricity supplier switching requests, chart breakdowns and monthly totals. Defaults to all customer types and all years.',
+    method: 'GET',
+    path: '/api/v1/switching-requests/',
+    parameters: [
+      'customer_type (optional, residential | non_residential | all; default all)',
+      'year (optional, integers >= 2021; repeat year=2021&year=2022 or use year=2021,2022; default all years)',
+    ],
+    responseExample: `{
+  "filter": { "customer_type": "all", "year": "all", "years": "all" },
+  "unit": "count",
+  "available_years": [2021],
+  "charts": {
+    "requests_by_status": {...},
+    "requests_by_customer_type": {...},
+    "requests_by_regulation_type": {...},
+    "requests_by_rejection_reason": {...}
+  },
+  "monthly_requests": [...],
+  "monthly_rejections_by_reason": [...],
+  "total_requests": 888882,
+  "total_rejections": 277708
+}`,
+  },
+  {
+    id: 'switching-requests-export',
+    title: 'ייצוא סטטוס בקשות ניוד',
+    description:
+      'Export switching requests to Excel (XLSX), using the same customer and multi-year filters as the JSON endpoint.',
+    method: 'GET',
+    path: '/api/v1/switching-requests/export',
+    parameters: [
+      'customer_type (optional, residential | non_residential | all; default all)',
+      'year (optional, integers >= 2021; repeated or comma-separated; default all years)',
+    ],
+    responseExample:
+      'Streamed Excel file (switching_requests_all.xlsx or switching_requests_2021_2022.xlsx for selected years)',
+  },
+  {
+    id: 'co2-emissions-savings',
+    title: 'פליטות CO2 שנחסכו עקב השימוש באנרגיה מתחדשת',
+    description:
+      'CO2 emissions avoided through renewable generation, using the source Renewables field (5-minute rates summed and divided by 12). Both dates must be supplied; otherwise defaults to the last 30 days.',
+    method: 'GET',
+    path: '/api/v1/co2/emissions-savings',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: `{
+  "total": 123456.78,
+  "unit": "tons CO2",
+  "start_date": "2026-01-03",
+  "end_date": "2026-02-02"
+}`,
+  },
+  {
+    id: 'co2-emissions-ratio',
+    title: 'ממקורות פוסיליים CO2 שיעור פליטות',
+    description:
+      'Energy-weighted CO2 intensity: total fossil emissions divided by total demand (MWh), not a sum of sample ratios. Both dates must be supplied; otherwise defaults to the last 30 days.',
+    method: 'GET',
+    path: '/api/v1/co2/emissions-ratio',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: `{
+  "total": 0.4,
+  "unit": "tons CO2/MWh",
+  "total_emissions": 400000,
+  "total_emissions_unit": "tons CO2",
+  "total_generation_mwh": 1000000,
+  "start_date": "2026-01-03",
+  "end_date": "2026-02-02"
+}`,
+  },
+  {
+    id: 'co2-total-production',
+    title: 'ייצור חשמל',
+    description:
+      'Total system generation (MWh). Both dates must be supplied; otherwise defaults to the last 30 days.',
+    method: 'GET',
+    path: '/api/v1/co2/total-production',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: `{
+  "total": 7036671.71,
+  "unit": "MWh",
+  "start_date": "2026-01-03",
+  "end_date": "2026-02-02"
+}`,
+  },
+  {
+    id: 'co2-emissions-mix',
+    title: 'תמהיל פליטות CO2',
+    description:
+      'CO2 emissions mix, infographics and time series. Without both dates, day/month/year use 1/30/365 days respectively. The fossil infographic is an average rate (mTCO2/h), not the period total.',
+    method: 'GET',
+    path: '/api/v1/co2/emissions-mix',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+      'view (optional, day | month | year; default month)',
+    ],
+    responseExample: `{
+  "view": "month",
+  "start_date": "2026-01-03",
+  "end_date": "2026-02-02",
+  "total_emissions": 2505223.89,
+  "total_emissions_unit": "tons CO2",
+  "pie_chart": {
+    "coal": { "value": 391019.99, "percentage": 15.61, "unit": "tons CO2" },
+    "natural_gas": {...},
+    "diesel": {...}
+  },
+  "infographics": {...},
+  "time_series": [...]
+}`,
+  },
+  {
+    id: 'co2-emissions-mix-export',
+    title: 'ייצוא תמהיל פליטות CO2',
+    description:
+      'Export CO2 emissions mix to Excel (XLSX). Without both dates, day/month/year use 1/30/365 days respectively.',
+    method: 'GET',
+    path: '/api/v1/co2/emissions-mix/export',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+      'view (optional, day | month | year; default month)',
+    ],
+    responseExample:
+      'Streamed Excel file (co2_emissions_mix_STARTDATE_to_ENDDATE.xlsx)',
+  },
+  {
+    id: 'co2-emissions-over-time',
+    title: 'פליטות CO2 מייצור חשמל',
+    description:
+      'CO2 emissions over time and infographics. Without both dates, month/custom use 30 days and year uses 365 days. Year gives monthly points; other views give daily points. The fossil infographic is an average rate (mTCO2/h).',
+    method: 'GET',
+    path: '/api/v1/co2/emissions-over-time',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+      'view (optional, month | year | custom; default month)',
+    ],
+    responseExample: `{
+  "view": "month",
+  "start_date": "2026-01-03",
+  "end_date": "2026-02-02",
+  "infographics": {...},
+  "chart_data": [{ "period": "2026-01-03", "label": "03 Jan", "coal": 12431.86, "natural_gas": 64471.12, "diesel": 39.73, "total_emissions": 76942.71, ... }]
+}`,
+  },
+  {
+    id: 'co2-emissions-over-time-export',
+    title: 'ייצוא פליטות CO2 מייצור חשמל',
+    description:
+      'Export CO2 emissions over time to Excel (XLSX). Without both dates, month/custom use 30 days and year uses 365 days.',
+    method: 'GET',
+    path: '/api/v1/co2/emissions-over-time/export',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+      'view (optional, month | year | custom; default month)',
+    ],
+    responseExample:
+      'Streamed Excel file (co2_emissions_over_time_STARTDATE_to_ENDDATE.xlsx)',
+  },
+  {
+    id: 'co2-total-vs-ratio',
+    title: 'סך פליטות CO₂ מול יחס פליטות CO₂',
+    description:
+      'Total CO2 emissions vs ratio with infographics. Without both dates, month/custom use 30 days and year uses 365 days. This chart currently calculates emissions_ratio as (raw emissions sum / raw demand sum) / 12, unlike emissions-ratio; its available export route is /export-csv (CSV).',
+    method: 'GET',
+    path: '/api/v1/co2/total-vs-ratio',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+      'view (optional, month | year | custom; default month)',
+    ],
+    responseExample: `{
+  "view": "month",
+  "start_date": "2026-01-03",
+  "end_date": "2026-02-02",
+  "infographics": {...},
+  "chart_data": [{ "period": "2026-01-03", "total_emissions": 4800, "emissions_ratio": 0.0333, "generation_mwh": 12000, "unit_emissions": "tons CO2", "unit_ratio": "tons CO2/MWh", ... }]
+}`,
+  },
+  {
+    id: 'installed-capacity-cumulative',
+    title: 'הספק מותקן (מצטבר) של מתקנים לייצור אנרגיות מתחדשות',
+    description:
+      'Cumulative installed capacity with technology and district breakdowns. The year cutoff applies only to the series, not headline totals or breakdowns.',
+    method: 'GET',
+    path: '/api/v1/renewables/installed-capacity/cumulative',
+    parameters: [
+      'year (optional, integer; include series through this year; default all years)',
+      'district (optional, string; case-insensitive exact match; default all districts)',
+      'technology (optional, string; case-insensitive exact match; default all technologies)',
+    ],
+    responseExample: `{
+  "title": "Installed Capacity (Cumulative) of Renewable Energy Facilities",
+  "total_installed_mw": 7756.107,
+  "total_facilities": 63687,
+  "series": [{ "period": "2012-01", "added_mw": 0.123, "cumulative_mw": 0.123 }],
+  "technology_breakdown": {...},
+  "district_breakdown": {...}
+}`,
+  },
+  {
+    id: 'installed-capacity-cumulative-export',
+    title: 'ייצוא הספק מותקן (מצטבר) של מתקנים לייצור אנרגיות מתחדשות',
+    description:
+      'Export cumulative installed capacity to Excel (XLSX). The year cutoff applies only to the series, not totals or breakdowns.',
+    method: 'GET',
+    path: '/api/v1/renewables/installed-capacity/cumulative/export',
+    parameters: [
+      'year (optional, integer; series through this year; default all years)',
+      'district (optional, case-insensitive exact string; default all)',
+      'technology (optional, case-insensitive exact string; default all)',
+    ],
+    responseExample: 'Streamed Excel file (installed_capacity_cumulative.xlsx)',
+  },
+  {
+    id: 'installed-capacity-growth',
+    title: 'הספק מותקן שנתי של מתקנים לייצור אנרגיות מתחדשות',
+    description:
+      'Yearly capacity additions and cumulative capacity. growth_rate_percent is the percentage change in annual additions, not cumulative capacity; the first year has a null growth rate.',
+    method: 'GET',
+    path: '/api/v1/renewables/installed-capacity/growth',
+    parameters: [
+      'district (optional, case-insensitive exact string; default all)',
+      'technology (optional, case-insensitive exact string; default all)',
+    ],
+    responseExample: `{
+  "title": "Installed Capacity — Growth Rate",
+  "series": [{ "year": 2024, "added_mw": 420.0, "cumulative_mw": 7200.0, "growth_rate_percent": 6.2 }],
+  "filters_applied": { "district": null, "technology": "Photovoltaic" }
+}`,
+  },
+  {
+    id: 'installed-capacity-growth-export',
+    title: 'ייצוא הספק מותקן שנתי של מתקנים לייצור אנרגיות מתחדשות',
+    description:
+      'Export installed capacity additions and growth to Excel (XLSX).',
+    method: 'GET',
+    path: '/api/v1/renewables/installed-capacity/growth/export',
+    parameters: [
+      'district (optional, case-insensitive exact string; default all)',
+      'technology (optional, case-insensitive exact string; default all)',
+    ],
+    responseExample: 'Streamed Excel file (installed_capacity_growth.xlsx)',
+  },
+  {
+    id: 'installed-capacity-by-facility-size',
+    title: 'מתקני ייצור אנרגיה מתחדשת מחוברים לרשת לפי גודל',
+    description:
+      'Installed capacity and facility counts by size bracket and year, including totals_by_size. The optional year is an inclusive upper cutoff.',
+    method: 'GET',
+    path: '/api/v1/renewables/installed-capacity/by-facility-size',
+    parameters: [
+      'year (optional, integer; include data through this year; default all years)',
+      'district (optional, case-insensitive exact string; default all)',
+    ],
+    responseExample: `{
+  "title": "Facility Capacity Connected Over Time by Facility Size",
+  "size_bracket_definitions": [
+    { "label": "0-200 kW", "min_mw": 0, "max_mw": 0.2 },
+    { "label": "201-630 kW", "min_mw": 0.2, "max_mw": 0.63 },
+    { "label": "631-5000 kW", "min_mw": 0.63, "max_mw": 5.0 },
+    { "label": "5001 kW +", "min_mw": 5.0, "max_mw": null }
+  ],
+  "series": [{ "year": 2024, "size_brackets": { "0-200 kW": { "total_mw": 120.5, "facility_count": 900 }, ... }, "year_total_mw": 200.7, "year_facility_count": 1020 }],
+  "totals_by_size": {...}
+}`,
+  },
+  {
+    id: 'installed-capacity-by-facility-size-export',
+    title: 'ייצוא מתקני ייצור אנרגיה מתחדשת מחוברים לרשת לפי גודל',
+    description:
+      'Export installed capacity by facility size to Excel (XLSX), including data through the selected year.',
+    method: 'GET',
+    path: '/api/v1/renewables/installed-capacity/by-facility-size/export',
+    parameters: [
+      'year (optional, integer; inclusive upper cutoff; default all years)',
+      'district (optional, case-insensitive exact string; default all)',
+    ],
+    responseExample: 'Streamed Excel file (capacity_by_facility_size.xlsx)',
+  },
+  {
+    id: 'response-capacity-by-period',
+    title: 'תשובות מחלק לבקשות חיבור מתקנים לרשת',
+    description:
+      'Response capacity per month with an overall response-type breakdown containing MW and counts. Cancelled orders are included by default.',
+    method: 'GET',
+    path: '/api/v1/renewables/response-capacity/by-period',
+    parameters: [
+      'year (optional, integer; exact year; default all)',
+      'district (optional, string; default all)',
+      'technology (optional, string, e.g. Photovoltaic | Wind | Other; default all)',
+      'response_type (optional, string, e.g. Positive | Partial Positive | Limited Positive | Negative; default all)',
+      'include_cancelled (optional, boolean; default true)',
+    ],
+    responseExample: `{
+  "title": "Response Capacity Divided by Period",
+  "total_mw": 320.5,
+  "total_requests": 820,
+  "series": [{ "period": "2023-12", "total_mw": 320.5, "request_count": 820 }],
+  "response_type_breakdown": { "Positive": { "total_mw": 238.5, "count": 600 }, ... }
+}`,
+  },
+  {
+    id: 'response-capacity-by-period-export',
+    title: 'ייצוא תשובות מחלק לבקשות חיבור מתקנים לרשת',
+    description:
+      'Export response capacity by period to Excel (XLSX). Cancelled orders are included by default.',
+    method: 'GET',
+    path: '/api/v1/renewables/response-capacity/by-period/export',
+    parameters: [
+      'year (optional, integer; exact year; default all)',
+      'district (optional, string; default all)',
+      'technology (optional, string; default all)',
+      'response_type (optional, string; default all)',
+      'include_cancelled (optional, boolean; default true)',
+    ],
+    responseExample: 'Streamed Excel file (response_capacity_by_period.xlsx)',
+  },
+  {
+    id: 'response-capacity-by-size',
+    title: 'תשובות חיוביות לפי גודל',
+    description:
+      'Response capacity by facility size and year. Defaults to Positive responses and includes cancelled orders; response_type=all includes all response types.',
+    method: 'GET',
+    path: '/api/v1/renewables/response-capacity/by-size',
+    parameters: [
+      'year (optional, integer; exact year; default all)',
+      'district (optional, string; default all)',
+      'response_type (optional, string; default Positive; all disables response filtering)',
+      'include_cancelled (optional, boolean; default true)',
+    ],
+    responseExample: `{
+  "title": "Response Capacity Divided by Facility Size (Kilowatt)",
+  "total_mw": 5581.228,
+  "total_requests": 59564,
+  "filters_applied": { "year": null, "district": null, "include_cancelled": true },
+  "size_bracket_definitions": [...],
+  "series": [{ "size_bracket": "0-200 kW", "total_mw": 2185.133, "request_count": 53497 }],
+  "yearly_series": [{ "year": 2024, "size_brackets": { "0-200 kW": { "total_mw": 427.761, "count": 10761 }, ... } }]
+}`,
+  },
+  {
+    id: 'response-capacity-by-size-export',
+    title: 'ייצוא תשובות חיוביות לפי גודל',
+    description:
+      'Export response capacity by size to Excel (XLSX). Defaults to Positive responses and includes cancelled orders.',
+    method: 'GET',
+    path: '/api/v1/renewables/response-capacity/by-size/export',
+    parameters: [
+      'year (optional, integer; exact year; default all)',
+      'district (optional, string; default all)',
+      'response_type (optional, string; default Positive; all disables response filtering)',
+      'include_cancelled (optional, boolean; default true)',
+    ],
+    responseExample: 'Streamed Excel file (response_capacity_by_size.xlsx)',
+  },
+  {
+    id: 'response-capacity-by-district',
+    title: 'תשובות מחלק לפי מחוז',
+    description:
+      'Response capacity per district with response-type and technology breakdowns. Cancelled orders are included by default.',
+    method: 'GET',
+    path: '/api/v1/renewables/response-capacity/by-district',
+    parameters: [
+      'year (optional, integer; exact year; default all)',
+      'technology (optional, string; default all)',
+      'include_cancelled (optional, boolean; default true)',
+    ],
+    responseExample: `{
+  "title": "Response Capacity Divided by District",
+  "series": [{ "district": "South", "total_mw": 7200.0, "request_count": 2100, "response_breakdown": { "Positive": { "total_mw": 6800, "count": 2000 }, ... } }],
+  "district_technology_breakdown": { "South": { "Photovoltaic": 6800.0, "Wind": 400.0 } },
+  "district_response_breakdown": {...}
+}`,
+  },
+  {
+    id: 'response-capacity-by-district-export',
+    title: 'ייצוא תשובות מחלק לפי מחוז',
+    description:
+      'Export response capacity by district to Excel (XLSX). Cancelled orders are included by default.',
+    method: 'GET',
+    path: '/api/v1/renewables/response-capacity/by-district/export',
+    parameters: [
+      'year (optional, integer; exact year; default all)',
+      'technology (optional, string; default all)',
+      'include_cancelled (optional, boolean; default true)',
+    ],
+    responseExample: 'Streamed Excel file (response_capacity_by_district.xlsx)',
+  },
+  {
+    id: 'renewables-transition',
+    title: 'שיעור הייצור ממקורות מתחדשים',
+    description:
+      'Monthly renewable share with daily detail and per-year overlays. Both dates must be supplied; otherwise defaults to January 1 of the current year through today. There is no year query parameter.',
+    method: 'GET',
+    path: '/api/v1/renewables/transition',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: `{
+  "start_date": "2025-01-01",
+  "end_date": "2025-12-31",
+  "filter": "multi_year",
+  "available_years": [2025],
+  "monthly_series": [{ "period": "2025-01", "year": 2025, "month": 1, "renewable_mwh": 170, "total_mwh": 1000, "renewable_share_percent": 17 }],
+  "daily_series": [...],
+  "years_data": {...},
+  "totals": { "renewable_mwh": 170, "total_mwh": 1000, "renewable_share_percent": 17 },
+  "unit": "[%]"
+}`,
+  },
+  {
+    id: 'renewables-transition-export',
+    title: 'ייצוא שיעור הייצור ממקורות מתחדשים',
+    description:
+      'Export renewable transition to Excel (XLSX). Without both dates, defaults to the current year to date; no year query parameter.',
+    method: 'GET',
+    path: '/api/v1/renewables/transition/export',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: 'Streamed Excel file (renewable_transition.xlsx)',
+  },
+  {
+    id: 'renewables-delivery-4-renewable-forecast-israel',
+    title: 'יעדים מול ייצור בפועל',
+    description:
+      'Annual actual renewable share, realistic forecast, Ministry of Energy and NZO targets. Values are percentages, not fractions. The legacy hash is retained; the canonical route has no delivery-4 prefix.',
+    method: 'GET',
+    path: '/api/v1/renewables/renewable-forecast-israel',
+    responseExample: `{
+  "title": "Renewables forecast trajectory in Israel",
+  "value_unit": "percent",
+  "data": [{ "year": 2020, "renewable_share_percent": 6.3, "realistic_forecast_percent": 6.3, "ministry_target_percent": 10, "nzo_target_percent": 27.5 }],
+  "metadata": { "year_start": 2020, "year_end": 2050, "realistic_forecast_factor_percent": 90 }
+}`,
+  },
+  {
+    id: 'renewables-delivery-4-renewable-forecast-israel-export',
+    title: 'ייצוא יעדים מול ייצור בפועל',
+    description:
+      'Export Israel renewable forecast and targets to Excel (XLSX), with percentage values.',
+    method: 'GET',
+    path: '/api/v1/renewables/renewable-forecast-israel/export',
+    responseExample: 'Streamed Excel file (renewable_forecast_israel.xlsx)',
+  },
+  {
+    id: 'renewables-delivery-4-international-renewable-comparison',
+    title: 'השוואה בין לאומית של יעדי מתחדשות וייצור אנרגיה סולארית',
+    description:
+      'Per-region 2030 targets, optional 2050 targets and optional 2024 solar share. Values are percentages, not fractions; 2030 targets are always included.',
+    method: 'GET',
+    path: '/api/v1/renewables/international-renewable-comparison',
+    parameters: [
+      'include_2050_targets (optional, boolean; default true)',
+      'include_solar_share (optional, boolean; default true)',
+    ],
+    responseExample: `{
+  "value_unit": "percent",
+  "regions": [{ "region": "Israel", "region_he": "ישראל", "region_key": "israel", "renewable_target_percent_2030": 30, "solar_share_percent_2024": 14.6, "renewable_target_percent_2050": 77 }],
+  "regions_without_solar_data": [],
+  "filters": { "include_2030_targets": true, "include_2050_targets": true, "include_solar_share": true }
+}`,
+  },
+  {
+    id: 'renewables-delivery-4-international-renewable-comparison-export',
+    title: 'ייצוא השוואה בין לאומית של יעדי מתחדשות וייצור אנרגיה סולארית',
+    description:
+      'Export international renewable comparison to Excel (XLSX), using the same filters and percentage units as the JSON endpoint.',
+    method: 'GET',
+    path: '/api/v1/renewables/international-renewable-comparison/export',
+    parameters: [
+      'include_2050_targets (optional, boolean; default true)',
+      'include_solar_share (optional, boolean; default true)',
+    ],
+    responseExample:
+      'Streamed Excel file (international_renewable_comparison.xlsx)',
+  },
+  {
+    id: 'renewables-potential-by-industry',
+    title: 'שיעור הייצור ממקורות מתחדשים',
+    description:
+      'Daily renewable generation by solar, wind and other buckets (MWh), not industrial-sector capacity estimates. Both dates must be supplied; otherwise defaults to the last 365 days. No year query parameter.',
+    method: 'GET',
+    path: '/api/v1/renewables/potential-by-industry',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: `{
+  "start_date": "2025-01-01",
+  "end_date": "2025-12-31",
+  "filter": "date_range",
+  "series": [{ "date": "2025-01-01", "solar_mwh": 100, "wind_mwh": 20, "other_mwh": 10, "total_mwh": 1000 }],
+  "totals": { "solar": 100, "wind": 20, "other": 10, "total_mwh": 1000 },
+  "unit": "MWh"
+}`,
+  },
+  {
+    id: 'renewables-potential-by-industry-export',
+    title: 'ייצוא שיעור הייצור ממקורות מתחדשים',
+    description:
+      'Export daily renewable generation buckets to Excel (XLSX). Without both dates, defaults to the last 365 days; no year query parameter.',
+    method: 'GET',
+    path: '/api/v1/renewables/potential-by-industry/export',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+    ],
+    responseExample: 'Streamed Excel file (renewable_potential_industry.xlsx)',
+  },
+  {
+    id: 'renewables-production-mix',
+    title: 'תמהיל ייצור אנרגיה מתחדשת',
+    description:
+      'Renewable generation by solar, wind and other buckets in MWh. Both dates must be supplied; otherwise defaults to the last 30 days (backend-configurable). View is inferred from the range; category filtering zeros out the other buckets.',
+    method: 'GET',
+    path: '/api/v1/renewables/production-mix',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+      'category (optional, solar | wind | other; case-insensitive; default all)',
+    ],
+    responseExample: `{
+  "start_date": "2026-01-01",
+  "end_date": "2026-01-31",
+  "filter": "month",
+  "category_filter": null,
+  "series": [{ "period": "2026-01", "solar_mwh": 101750.2, "wind_mwh": 15000.6, "other_mwh": 8000.4, "total_mwh": 124751.2 }],
+  "totals": { "solar": 101750.2, "wind": 15000.6, "other": 8000.4, "total": 124751.2 },
+  "unit": "MWh"
+}`,
+  },
+  {
+    id: 'renewables-production-mix-export',
+    title: 'ייצוא תמהיל ייצור אנרגיה מתחדשת',
+    description:
+      'Export renewable generation mix to Excel (XLSX). Without both dates, defaults to the last 30 days (backend-configurable).',
+    method: 'GET',
+    path: '/api/v1/renewables/production-mix/export',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+      'category (optional, solar | wind | other; case-insensitive; default all)',
+    ],
+    responseExample: 'Streamed Excel file (renewable_production_mix.xlsx)',
+  },
+  {
+    id: 'heat-load-vs-generation',
+    title: 'ייצור חשמל אל מול עומס החום',
+    description:
+      'THI heat load vs electricity generation (MW). Without both dates, year uses 365 days and month/custom use 30 days. Year uses weekly buckets; month/custom use daily buckets.',
+    method: 'GET',
+    path: '/api/v1/heat-load-vs-generation/',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+      'view (optional, month | year | custom; default year)',
+    ],
+    responseExample: `{
+  "view": "year",
+  "start_date": "2026-02-01",
+  "end_date": "2026-02-18",
+  "units": { "heat_load": "THI", "electricity_generation": "MW" },
+  "series": [{ "period": "2026-02-16/2026-02-22", "label": "16 Feb", "heat_load": 11.96, "electricity_generation_mw": 8620.43 }]
+}`,
+  },
+  {
+    id: 'heat-load-vs-generation-export',
+    title: 'ייצוא ייצור חשמל אל מול עומס החום',
+    description:
+      'Export heat load vs generation to Excel (XLSX). Without both dates, year uses 365 days and month/custom use 30 days.',
+    method: 'GET',
+    path: '/api/v1/heat-load-vs-generation/export',
+    parameters: [
+      'start_date (optional, YYYY-MM-DD | DD-MM-YYYY | MM-YYYY; supply with end_date)',
+      'end_date (optional, same formats; supply with start_date)',
+      'view (optional, month | year | custom; default year)',
+    ],
+    responseExample:
+      'Streamed Excel file (heat_load_vs_generation_STARTDATE_to_ENDDATE.xlsx)',
+  },
+  {
+    id: 'api-catalog',
+    title: 'קטלוג API',
+    description:
+      'Returns the eight allowlisted public endpoint paths from the OpenAPI schema, sorted by link and method. This is not a complete public endpoint inventory; export and other supported routes are omitted, and sample bodies may come from legacy overrides.',
+    method: 'GET',
+    path: '/api/v1/apis/',
+    responseExample: `[
+  {
+    "title": "Energy Overview",
+    "link": "/api/v1/energy/overview",
+    "method": "GET",
+    "description": "Hierarchical breakdown of generation by source (level1/level2), totals, renewable share, and inferred period for the requested date window (defaults to last 12 months).",
+    "params": [...],
+    "sample_response": ["200 OK"],
+    "sample_response_body": [{...}]
+  },
+  ...
+]`,
+  },
+]

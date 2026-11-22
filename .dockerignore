@@ -1,18 +1,39 @@
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.db
-*.sqlite3
-*.log
-*.xlsx
-venv/
-.env
-.env.*
+# Keep the root workspace manifests/lockfile and apps/frontend source/public.
 .git
-.gitignore
-.vscode/
-.idea/
-energy_mix_today_20251128203232.xlsx
-Files_Netunei_hashmal_mp_niyud (3).csv
-Files_Netunei_hashmal_mp_tzarchan (4).csv
+**/.git
+**/node_modules
+**/.pnpm-store
+**/dist
+**/coverage
+**/.vite
+**/.turbo
+**/.cache
+old-nextjs
+**/.next
+
+# Python environments and local development artifacts are not build inputs.
+**/.venv
+**/venv
+**/__pycache__
+**/*.py[cod]
+**/*.log
+**/*.tsbuildinfo
+**/.DS_Store
+**/.vscode
+**/.idea
+
+# Runtime secrets must never enter the frontend build context or image layers.
+**/.env
+**/.env.*
+**/.envrc
+**/.npmrc
+**/.netrc
+**/.aws
+**/.ssh
+**/id_rsa
+**/id_ecdsa
+**/id_ed25519
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx

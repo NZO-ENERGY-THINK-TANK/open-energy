@@ -1,0 +1,39 @@
+.smp-date-range.ant-picker {
+  max-width: 100%;
+  border-radius: 32px;
+  font-family: Heebo, sans-serif;
+}
+.smp-date-range .ant-picker-input {
+  min-width: 100px;
+  cursor: pointer;
+}
+.smp-date-range .ant-picker-input input {
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.smp-date-range .ant-picker-input:first-child input {
+  text-align: left;
+}
+.smp-date-range .ant-picker-input:last-of-type input {
+  text-align: right;
+}
+.smp-date-range .ant-picker-range-separator {
+  padding: 0 8px;
+  color: #59687d;
+  font-weight: 500;
+}
+@media (max-width: 768px) {
+  .smp-date-range.ant-picker {
+    padding: 4px 8px;
+  }
+  .smp-date-range .ant-picker-input {
+    min-width: 70px;
+  }
+  .smp-date-range .ant-picker-input input {
+    font-size: 11px;
+  }
+  .smp-date-range .ant-picker-range-separator {
+    padding: 0 4px;
+  }
+}
