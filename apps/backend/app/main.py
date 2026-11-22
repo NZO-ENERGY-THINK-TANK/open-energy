@@ -48,7 +48,7 @@ _notifier_task: asyncio.Task | None = None
 
 @app.get("/health", include_in_schema=False)
 async def health():
-    return {"status": "ok"}
+    return {"status": "ok2"}
 
 
 @app.middleware("http")
