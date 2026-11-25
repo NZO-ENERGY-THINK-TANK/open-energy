@@ -1,5 +1,11 @@
 data_files/*
 
+# TODO: remove this when u fix the scrape stale proc
+!/data_files/Files_Netunei_hashmal_mp_tzarchan_25-11-2026.csv
+!/data_files/Files_Netunei_hashmal_mp_niyud_25-11-2026.csv
+!/data_files/Files_Netunei_hashmal_my_mehubarim_25-11-2026.csv
+!/data_files/Files_Netunei_hashmal_my_teshuvotmehalek_25-11-2026.csv
+
 # it seems like there is no auto download for these:
 !/data_files/diagram_sheet_1.csv
 !/data_files/diagram_sheet_2.csv

@@ -282,7 +282,7 @@ export function ModeSwitch({
   options: { value: string; label: string }[]
 }) {
   return (
-    <div className="mt-4 mb-4 flex w-fit max-w-full gap-1 rounded-full bg-[#F8F8F8] p-1 shadow-[inset_0px_4px_10px_0px_#0000001A] md:-mt-10 md:p-[6px]">
+    <div className="mt-4 mb-4 flex w-fit max-w-full gap-1 rounded-full bg-[#F8F8F8] p-1 shadow-[inset_0px_4px_10px_0px_#0000001A] md:p-[6px]">
       {options.map((option) => (
         <button
           key={option.value}

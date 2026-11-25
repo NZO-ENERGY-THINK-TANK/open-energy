@@ -161,8 +161,15 @@ class ConnectedFacilitiesService:
 
         # Parse date
         if "commercial_operation_date" in df.columns:
+
             df["date"] = pd.to_datetime(
-                df["commercial_operation_date"], format="%d/%m/%Y", errors="coerce",
+                # New format (2026)
+                df["commercial_operation_date"], format="%d/%m/%Y %H:%M", errors="coerce",
+            ).fillna(
+                # Old format (2025)
+                pd.to_datetime(
+                    df["commercial_operation_date"], format="%d/%m/%Y", errors="coerce",
+                )
             )
             df = df.dropna(subset=["date"])
         else:
