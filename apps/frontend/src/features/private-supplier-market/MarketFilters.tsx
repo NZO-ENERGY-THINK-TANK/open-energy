@@ -6,7 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import type { CustomerType } from './types'
+import type { CustomerType, SupplierType } from './types'
 
 const selectClassName =
   'h-9 rounded-full border border-[#DEDEDE] bg-white px-3 text-sm text-[#484C56] disabled:cursor-not-allowed disabled:opacity-60'
@@ -45,12 +45,24 @@ export function CustomerFilter({
   )
 }
 
-export function SupplierFilter() {
+export function SupplierFilter({
+  value,
+  onChange,
+}: {
+  value: SupplierType
+  onChange: (value: SupplierType) => void
+}) {
   return (
     <label className="flex min-w-32 flex-col gap-1 text-sm text-[#59687D]">
       סוג מספק
-      <select className={selectClassName} value="all" disabled>
-        <option value="all">הכל — פילוח לא זמין</option>
+      <select
+        className={selectClassName}
+        value={value}
+        onChange={(event) => onChange(event.target.value as SupplierType)}
+      >
+        <option value="all">הכל</option>
+        <option value="virtual_suppliers">מספקים וירטואליים</option>
+        <option value="suppliers_with_generation">מספקים עם אמצעי ייצור</option>
       </select>
     </label>
   )

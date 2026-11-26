@@ -9,7 +9,7 @@ import {
 } from './MarketFilters'
 import { rejectionReasons } from './constants'
 import QueryContent from '../../components/data/QueryContent'
-import type { CustomerType, RejectionReason } from './types'
+import type { CustomerType, RejectionReason, SupplierType } from './types'
 
 export default function RejectionReasonsCard({
   availableYears,
@@ -17,6 +17,7 @@ export default function RejectionReasonsCard({
   availableYears: number[]
 }) {
   const [customerType, setCustomerType] = useState<CustomerType>()
+  const [supplierType, setSupplierType] = useState<SupplierType>('all')
   const [years, setYears] = useState<number[]>([])
   const [reasons, setReasons] = useState<RejectionReason[]>(
     rejectionReasons.map((reason) => reason.value),
@@ -37,8 +38,8 @@ export default function RejectionReasonsCard({
             בעיות במילוי הבקשה ואחר.
           </p>
           <p>
-            הסינון לפי סיבות הדחייה נעשה בתרשימים בלבד. נתוני השרת אינם מאפשרים
-            פילוח משולב לפי סוג מספק.
+            הסינון לפי סוג מספק וסיבות הדחייה נעשה בתרשימים בלבד, על בסיס נתוני
+            הפילוח המדווחים.
           </p>
         </>
       }
@@ -53,7 +54,7 @@ export default function RejectionReasonsCard({
           values={years}
           onChange={setYears}
         />
-        <SupplierFilter />
+        <SupplierFilter value={supplierType} onChange={setSupplierType} />
         <CustomerFilter value={customerType} onChange={setCustomerType} />
         <MultiSelectFilter
           label="סיבת דחייה"
@@ -63,9 +64,7 @@ export default function RejectionReasonsCard({
           keepOne
         />
       </div>
-      <p className="mb-4 text-sm text-[#59687D]">
-        סינון לפי סוג מספק אינו זמין בנתוני הפילוח. מוצגים כלל המספקים.
-      </p>
+
       <QueryContent
         isPending={query.isPending}
         isError={query.isError}
@@ -78,7 +77,7 @@ export default function RejectionReasonsCard({
         {query.data && (
           <RejectionReasonsChart
             data={query.data}
-            supplierType="all"
+            supplierType={supplierType}
             years={years}
             reasons={reasons}
           />

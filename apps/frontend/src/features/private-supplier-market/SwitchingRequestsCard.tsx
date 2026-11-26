@@ -8,7 +8,7 @@ import {
   SupplierFilter,
 } from './MarketFilters'
 import QueryContent from '../../components/data/QueryContent'
-import type { CustomerType } from './types'
+import type { CustomerType, SupplierType } from './types'
 
 export default function SwitchingRequestsCard({
   availableYears,
@@ -16,6 +16,7 @@ export default function SwitchingRequestsCard({
   availableYears: number[]
 }) {
   const [customerType, setCustomerType] = useState<CustomerType>()
+  const [supplierType, setSupplierType] = useState<SupplierType>('all')
   const [years, setYears] = useState<number[]>([])
   const query = useSwitchingRequests(customerType, years)
   const yearOptions = [...availableYears]
@@ -30,11 +31,11 @@ export default function SwitchingRequestsCard({
         <>
           <p>
             מוצגים סטטוסי הבקשות הכוללים ומספר הבקשות לאורך זמן, עבור השנים וסוג
-            הלקוח שנבחרו.
+            הלקוח וסוג המספק שנבחרו.
           </p>
           <p>
-            אין בתשובת השרת פילוח סטטוסים לאורך זמן או פילוח משולב לפי סוג מספק.
-            לא מוצגים ערכים מחושבים לפי יחס משוער.
+            הסינון לפי סוג מספק נעשה בתרשימים בלבד. אין בתשובת השרת פילוח
+            סטטוסים לאורך זמן. לא מוצגים ערכים מחושבים לפי יחס משוער.
           </p>
         </>
       }
@@ -49,12 +50,10 @@ export default function SwitchingRequestsCard({
           values={years}
           onChange={setYears}
         />
-        <SupplierFilter />
+        <SupplierFilter value={supplierType} onChange={setSupplierType} />
         <CustomerFilter value={customerType} onChange={setCustomerType} />
       </div>
-      <p className="mb-4 text-sm text-[#59687D]">
-        סינון לפי סוג מספק אינו זמין בנתוני הפילוח. מוצגים כלל המספקים.
-      </p>
+
       <QueryContent
         isPending={query.isPending}
         isError={query.isError}
@@ -67,7 +66,7 @@ export default function SwitchingRequestsCard({
         {query.data && (
           <SwitchingRequestsChart
             data={query.data}
-            supplierType="all"
+            supplierType={supplierType}
             years={years}
           />
         )}
