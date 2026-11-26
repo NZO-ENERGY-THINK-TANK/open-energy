@@ -3,7 +3,7 @@ import type {
   SupplierType,
   SwitchingRequestsResponse,
 } from '../types'
-import { ChartNotice, ChartPanel, SupplierNotice } from './chartHelpers'
+import { ChartNotice, ChartPanel } from './chartHelpers'
 import {
   barsOption,
   donutOption,
@@ -31,17 +31,23 @@ export default function RejectionReasonsChart({
   years,
   reasons,
 }: RejectionReasonsChartProps) {
+  const filteredData =
+    supplierType === 'all' ? data : data.supplier_breakdowns?.[supplierType]
+  if (!filteredData) {
+    return <ChartNotice>אין נתונים זמינים לסוג המספק שנבחר.</ChartNotice>
+  }
+
   // An empty reason selection means all reasons, matching the legacy filters.
   const series = reasonSeries.filter(
     (item) => !reasons.length || reasons.includes(item.key),
   )
   const points = groupPeriods(
-    data.monthly_rejections_by_reason,
+    filteredData.monthly_rejections_by_reason,
     years,
     series,
     (row, key) => row[key as RejectionReason],
   )
-  const hasMonthlyData = data.monthly_rejections_by_reason.length > 0
+  const hasMonthlyData = filteredData.monthly_rejections_by_reason.length > 0
   // When monthly rows exist, both panels use exactly the same selected period.
   const items = hasMonthlyData
     ? series.map((item) => ({
@@ -51,7 +57,7 @@ export default function RejectionReasonsChart({
           0,
         ),
       }))
-    : data.charts.requests_by_rejection_reason.data.flatMap((row) => {
+    : filteredData.charts.requests_by_rejection_reason.data.flatMap((row) => {
         const item = series.find((entry) => entry.key === row.label)
         return item ? [{ ...item, value: row.count }] : []
       })
@@ -62,7 +68,6 @@ export default function RejectionReasonsChart({
       className="min-w-0 space-y-3"
       aria-label="סיבות לדחיית בקשות מעבר"
     >
-      <SupplierNotice supplierType={supplierType} />
       {!hasMonthlyData && (
         <ChartNotice>
           אין פילוח חודשי זמין. התרשים המעגלי מציג את סיכומי השרת לתקופת התשובה

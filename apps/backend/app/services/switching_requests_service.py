@@ -5,7 +5,7 @@ import os
 import re
 from io import BytesIO
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, cast
 
 import pandas as pd
 
@@ -187,8 +187,8 @@ def _load_dataframe(csv_path: Optional[Path] = None) -> pd.DataFrame:
         df = _promote_header_row(csv_path, df)
 
     if not df.empty and _looks_like_header_row(df.iloc[0]):
-        df = df.iloc[1:]
-    return df
+        df = df.iloc[1:, :]
+    return cast(pd.DataFrame, df)
 
 
 _KNOWN_HEADER_NORMS = {_normalize_col(m) for m in HEADER_MARKERS}
@@ -238,14 +238,10 @@ def _promote_header_row(csv_path: Path, original_df: pd.DataFrame) -> pd.DataFra
 def _group_sum(df: pd.DataFrame, key: str, value_col: str) -> List[Dict]:
     if key not in df.columns:
         return []
-    grouped = (
-        df.groupby(key)[value_col]
-        .sum()
-        .reset_index()
-        .sort_values(value_col, ascending=False)
-    )
+    grouped = cast(pd.DataFrame, df.groupby(key)[[value_col]].sum())
+    grouped = grouped.reset_index().sort_values(value_col, ascending=False)
     results = []
-    for _, row in grouped.iterrows():
+    for row in grouped.to_dict(orient="records"):
         results.append({"label": _translate_value(row[key]), "count": int(row[value_col])})
     return results
 
@@ -253,7 +249,10 @@ def _group_sum(df: pd.DataFrame, key: str, value_col: str) -> List[Dict]:
 def _summarize_rejection_reasons(df: pd.DataFrame, value_col: str) -> List[Dict]:
     if df.empty or "rejection_reason" not in df.columns:
         return [{"label": reason, "count": 0} for reason in REJECTION_REASON_ORDER]
-    grouped = df.groupby("rejection_reason")[value_col].sum().to_dict()
+    grouped = {
+        row["label"]: row["count"]
+        for row in _group_sum(df, "rejection_reason", value_col)
+    }
     results = []
     for reason in REJECTION_REASON_ORDER:
         results.append({"label": reason, "count": int(grouped.get(reason, 0))})
@@ -263,28 +262,37 @@ def _summarize_rejection_reasons(df: pd.DataFrame, value_col: str) -> List[Dict]
 def _monthly_rejection_breakdown(df: pd.DataFrame, value_col: str) -> List[Dict]:
     if df.empty or "rejection_reason" not in df.columns:
         return []
-    grouped = (
-        df.groupby(["month_label", "rejection_reason"])[value_col]
-        .sum()
-        .reset_index()
-    )
+    grouped = cast(
+        pd.DataFrame,
+        df.groupby(["month_label", "rejection_reason"])[[value_col]].sum(),
+    ).reset_index()
     pivot = grouped.pivot(index="month_label", columns="rejection_reason", values=value_col).fillna(0)
     for reason in REJECTION_REASON_ORDER:
         if reason not in pivot.columns:
             pivot[reason] = 0
-    pivot = pivot[REJECTION_REASON_ORDER].sort_index()
+    pivot = cast(pd.DataFrame, pivot[REJECTION_REASON_ORDER]).sort_index()
 
     results: List[Dict] = []
-    for month, row in pivot.iterrows():
-        item = {"month": month}
+    for month, row in pivot.to_dict(orient="index").items():
+        item: Dict = {"month": month}
         total = 0
         for reason in REJECTION_REASON_ORDER:
-            count = int(row.get(reason, 0))
+            count = int(row[reason])
             item[reason] = count
             total += count
         item["total_rejections"] = total
         results.append(item)
     return results
+
+
+def _monthly_request_totals(df: pd.DataFrame) -> List[Dict]:
+    grouped = cast(pd.DataFrame, df.groupby("month_label")[["requests_count"]].sum())
+    return (
+        grouped.reset_index()
+        .sort_values("month_label")
+        .rename(columns={"month_label": "month", "requests_count": "requests"})
+        .to_dict(orient="records")
+    )
 
 
 def build_payload(
@@ -387,7 +395,8 @@ def build_payload(
     # January, leaving only 6 buckets in monthly_requests (one per year).
     df["year_month"] = pd.to_datetime(df["year_month"], errors="coerce", dayfirst=True)
     df = df.dropna(subset=["year_month"])
-    df["requests_count"] = pd.to_numeric(df["requests_count"], errors="coerce").fillna(0)
+    counts = cast(pd.Series, pd.to_numeric(df["requests_count"], errors="coerce"))
+    df["requests_count"] = counts.fillna(0)
     df["year"] = df["year_month"].dt.year
     df["month_label"] = df["year_month"].dt.to_period("M").dt.strftime("%Y-%m")
 
@@ -409,7 +418,7 @@ def build_payload(
         invalid = [y for y in selected_years if y < 2021]
         if invalid:
             raise ValueError("year must be 2021 or later")
-        df = df[df["year"].isin(selected_years)]
+        df = df.loc[df["year"].isin(selected_years), :]
 
     if customer_type:
         normalized_customer_type = _translate_value(customer_type)
@@ -417,36 +426,48 @@ def build_payload(
         if normalized_customer_type not in allowed:
             raise ValueError(f"customer_type must be one of {sorted(allowed)}")
         if "customer_type" in df.columns:
-            df = df[df["customer_type"] == normalized_customer_type]
+            df = df.loc[df["customer_type"] == normalized_customer_type, :]
         elif normalized_customer_type != "unknown":
             df = df.iloc[0:0]
 
-    total_requests = int(df["requests_count"].sum())
+    total_requests = int(cast(float, df["requests_count"].sum()))
 
     rejected_df = df.copy()
     status_present = "status" in df.columns
     if status_present:
-        rejected_df = df[df["status"] == "rejected"].copy()
+        rejected_df = df.loc[df["status"] == "rejected", :].copy()
 
     reason_cols = [c for c in ("status_reason", "status_reason_details") if c in df.columns]
     if rejected_df.empty and reason_cols:
         # Fallback: if status mapping fails, infer rejections by presence of a reason.
-        rejected_df = df[df[reason_cols].notna().any(axis=1)].copy()
+        rejected_df = df.loc[df[reason_cols].notna().any(axis=1), :].copy()
 
     if "status_reason" in rejected_df.columns:
         rejected_df["rejection_reason"] = rejected_df["status_reason"].apply(_map_rejection_reason)
     elif "status_reason_details" in rejected_df.columns:
         rejected_df["rejection_reason"] = rejected_df["status_reason_details"].apply(_map_rejection_reason)
-    total_rejections = int(rejected_df["requests_count"].sum()) if not rejected_df.empty else 0
+    total_rejections = int(cast(float, rejected_df["requests_count"].sum())) if not rejected_df.empty else 0
 
-    monthly_totals = (
-        df.groupby("month_label")["requests_count"]
-        .sum()
-        .reset_index()
-        .sort_values("month_label")
-        .rename(columns={"month_label": "month", "requests_count": "requests"})
-        .to_dict(orient="records")
-    )
+    monthly_totals = _monthly_request_totals(df)
+
+    supplier_breakdowns = {}
+    if "regulation_type" in df.columns:
+        for supplier_type, supplier_df in df.groupby("regulation_type"):
+            supplier_rejections = rejected_df.loc[rejected_df["regulation_type"] == supplier_type, :]
+            supplier_breakdowns[supplier_type] = {
+                "charts": {
+                    "requests_by_status": {
+                        "label": "Total requests by status",
+                        "data": _group_sum(supplier_df, "status", "requests_count"),
+                    },
+                    "requests_by_rejection_reason": {
+                        "label": "Number of rejections by reason",
+                        "data": _summarize_rejection_reasons(supplier_rejections, "requests_count"),
+                    },
+                },
+                "monthly_requests": _monthly_request_totals(supplier_df),
+                "monthly_rejections_by_reason": _monthly_rejection_breakdown(supplier_rejections, "requests_count"),
+            }
 
     charts = {
         "requests_by_status": {
@@ -482,6 +503,7 @@ def build_payload(
         "available_years": available_years,
         "start_year": min(available_years) if available_years else None,
         "charts": charts,
+        "supplier_breakdowns": supplier_breakdowns,
         "monthly_requests": monthly_totals,
         "monthly_rejections_by_reason": _monthly_rejection_breakdown(rejected_df, "requests_count"),
         "total_requests": total_requests,

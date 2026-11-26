@@ -68,6 +68,18 @@ export type SwitchingRequestsResponse = {
       number
     >
   >
+  supplier_breakdowns?: Record<
+    string,
+    Pick<
+      SwitchingRequestsResponse,
+      'monthly_requests' | 'monthly_rejections_by_reason'
+    > & {
+      charts: Pick<
+        SwitchingRequestsResponse['charts'],
+        'requests_by_status' | 'requests_by_rejection_reason'
+      >
+    }
+  >
   total_requests: number
   total_rejections: number
   note?: string

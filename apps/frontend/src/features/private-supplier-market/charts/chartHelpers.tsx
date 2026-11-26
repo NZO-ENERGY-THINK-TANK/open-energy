@@ -1,7 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import ReactECharts from 'echarts-for-react'
 import type { EChartsOption } from 'echarts'
-import type { SupplierType } from '../types'
 
 export function ChartNotice({ children }: { children: ReactNode }) {
   return (
@@ -9,19 +8,6 @@ export function ChartNotice({ children }: { children: ReactNode }) {
       {children}
     </p>
   )
-}
-
-export function SupplierNotice({
-  supplierType,
-}: {
-  supplierType: SupplierType
-}) {
-  return supplierType !== 'all' ? (
-    <ChartNotice>
-      אין בנתונים פילוח משולב לפי סוג ספק. מוצגים נתונים לכל סוגי הספקים, ללא
-      סינון לפי הספק שנבחר.
-    </ChartNotice>
-  ) : null
 }
 
 export function ChartPanel({

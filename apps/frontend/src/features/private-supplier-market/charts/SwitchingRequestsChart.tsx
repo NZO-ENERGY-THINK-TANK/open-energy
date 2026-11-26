@@ -1,5 +1,5 @@
 import type { SupplierType, SwitchingRequestsResponse } from '../types'
-import { ChartNotice, ChartPanel, SupplierNotice } from './chartHelpers'
+import { ChartNotice, ChartPanel } from './chartHelpers'
 import {
   barsOption,
   donutOption,
@@ -25,12 +25,18 @@ export default function SwitchingRequestsChart({
   supplierType,
   years,
 }: SwitchingRequestsChartProps) {
-  const items = data.charts.requests_by_status.data.map((item) => ({
+  const filteredData =
+    supplierType === 'all' ? data : data.supplier_breakdowns?.[supplierType]
+  if (!filteredData) {
+    return <ChartNotice>אין נתונים זמינים לסוג המספק שנבחר.</ChartNotice>
+  }
+
+  const items = filteredData.charts.requests_by_status.data.map((item) => ({
     ...(statuses[item.label] ?? { name: item.label, color: '#7DB2CE' }),
     value: item.count,
   }))
   const points = groupPeriods(
-    data.monthly_requests,
+    filteredData.monthly_requests,
     years,
     requestSeries,
     (row) => row.requests,
@@ -42,7 +48,6 @@ export default function SwitchingRequestsChart({
       className="min-w-0 space-y-3"
       aria-label="בקשות מעבר לספקים פרטיים"
     >
-      <SupplierNotice supplierType={supplierType} />
       <ChartNotice>
         התרשים המעגלי מציג את סטטוסי הבקשות בתקופה שנבחרה. העמודות מציגות את סך
         הבקשות המדווח; אין במקור הנתונים פילוח סטטוסים חודשי.

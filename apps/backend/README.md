@@ -808,7 +808,9 @@ All date parameters use `YYYY-MM-DD` format. Omitted dates default to sensible r
 
 **Query Parameters:**
 
-- residential and non_residential
+- `customer_type` (optional): `all` (default), `residential`, or `non_residential`.
+- `year` (optional): years >= 2021; repeat (`?year=2021&year=2022`) or comma-separate (`?year=2021,2022`). Omit for all years.
+The response additionally includes `supplier_breakdowns`, keyed by source `regulation_type` (for example `virtual_suppliers` and `suppliers_with_generation`). Each entry contains `charts.requests_by_status`, `charts.requests_by_rejection_reason`, `monthly_requests`, and `monthly_rejections_by_reason`, using the same shapes as the overall response. These are actual supplier-level counts for the selected years/customer type, allowing local frontend filtering without extra requests or proportional estimates. Missing supplier entries mean no data for that supplier; a missing regulation column produces an empty object. Existing overall totals remain unchanged.
 
 **Response (200 OK):**
 
@@ -816,6 +818,7 @@ All date parameters use `YYYY-MM-DD` format. Omitted dates default to sensible r
 {
   "filter": {
     "customer_type": "all",
+
     "year": "all"
   },
   "unit": "count",
@@ -915,9 +918,11 @@ All date parameters use `YYYY-MM-DD` format. Omitted dates default to sensible r
 
 **Query Parameters:**
 
-- `year` (optional)
+- `customer_type` (optional): `all` (default), `residential`, or `non_residential`.
+- `year` (optional): years >= 2021; repeated or comma-separated. Omit for all years.
 
-**Response:** Streamed Excel file (`switching_requests_YYYY.xlsx`)
+
+**Response:** Streamed Excel file (`switching_requests_YYYY.xlsx`; selected years joined with `_`, or `all`). Exports include all supplier types; frontend-only supplier/rejection-reason selections do not affect the workbook.
 
 ---
 
